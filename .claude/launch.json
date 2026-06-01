@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "WealthVault",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8282"],
+      "port": 8282
+    }
+  ]
+}
