@@ -79,6 +79,7 @@ function AccountItem({acc,totInfo,baseCur,investments,allAccounts,saveAccount,on
                           ${isZero?html`<span className="tag" style=${{marginLeft:5,fontSize:9,background:'rgba(110,122,144,.15)',color:'var(--muted)'}}>已转出</span>`:null}
                         </div>
                         <div className="hold-name">${CUR_NAMES[h.currency]}${h.interestRate?' · '+h.interestRate+'%/年':''}${h.note?' · '+h.note:''}</div>
+                        ${(h.entryDate||h.summary)?html`<div className="txs tm">${h.entryDate?h.entryDate:''}${h.summary?' · '+h.summary:''}</div>`:null}
                       </div>
                       <div className="fc g8">
                         <div className="hold-amt" style=${{color:isZero?'var(--muted)':undefined}}>${CUR_SYM[h.currency]}${fmtNum(h.amount)}</div>

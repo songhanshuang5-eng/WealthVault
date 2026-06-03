@@ -315,9 +315,72 @@ function App(){
     });
   };
 
-  // ── 汇率操作 ──────────────────────────────────────────
-  const addFx=fx=>mut({fxHistory:[{...fx,id:genId(),ts:Date.now()},...data.fxHistory]});
-  const deleteFx=id=>mut({fxHistory:data.fxHistory.filter(f=>f.id!==id)});
+  // ── 货币兑换操作（卖出货币余额减少，买入货币余额增加）──
+  const addFx=fx=>{
+    const{accountId,sellCurrency,sellAmount,buyCurrency,buyAmount}=fx;
+    const sell=Number(sellAmount)||0;
+    const buy=Number(buyAmount)||0;
+    setData(prev=>{
+      const accounts=prev.accounts.map(acc=>{
+        if(!accountId||String(acc.id)!==String(accountId))return acc;
+        let hs=[...(acc.holdings||[])];
+        // 扣减卖出货币
+        if(sell>0&&sellCurrency){
+          let rem=sell;
+          hs=hs.map(h=>{
+            const hAmt=Number(h.amount)||0;
+            if(h.currency!==sellCurrency||rem<=0)return{...h,amount:hAmt};
+            const take=Math.min(hAmt,rem);rem-=take;
+            return{...h,amount:Math.round((hAmt-take)*1e8)/1e8};
+          });
+        }
+        // 增加买入货币
+        if(buy>0&&buyCurrency){
+          const idx=hs.findIndex(h=>h.currency===buyCurrency);
+          if(idx>=0)hs=hs.map((h,i)=>i===idx?{...h,amount:Math.round((Number(h.amount)+buy)*1e8)/1e8}:h);
+          else hs=[...hs,{currency:buyCurrency,amount:buy,id:genId()}];
+        }
+        return{...acc,holdings:hs};
+      });
+      const next={...prev,accounts,fxHistory:[{...fx,id:genId(),ts:Date.now()},...prev.fxHistory]};
+      saveData(next);setSaved(true);setTimeout(()=>setSaved(false),1500);
+      return next;
+    });
+  };
+  const deleteFx=id=>{
+    const fx=(data.fxHistory||[]).find(f=>f.id===id);
+    if(!fx)return;
+    if(!confirm('确认删除此兑换记录？将同步撤销账户余额变动。'))return;
+    const{accountId,sellCurrency,sellAmount,buyCurrency,buyAmount}=fx;
+    const sell=Number(sellAmount)||0;
+    const buy=Number(buyAmount)||0;
+    setData(prev=>{
+      const accounts=prev.accounts.map(acc=>{
+        if(!accountId||String(acc.id)!==String(accountId))return acc;
+        let hs=[...(acc.holdings||[])];
+        // 恢复卖出货币
+        if(sell>0&&sellCurrency){
+          const idx=hs.findIndex(h=>h.currency===sellCurrency);
+          if(idx>=0)hs=hs.map((h,i)=>i===idx?{...h,amount:Math.round((Number(h.amount)+sell)*1e8)/1e8}:h);
+          else hs=[...hs,{currency:sellCurrency,amount:sell,id:genId()}];
+        }
+        // 撤销买入货币
+        if(buy>0&&buyCurrency){
+          let rem=buy;
+          hs=hs.map(h=>{
+            const hAmt=Number(h.amount)||0;
+            if(h.currency!==buyCurrency||rem<=0)return{...h,amount:hAmt};
+            const take=Math.min(hAmt,rem);rem-=take;
+            return{...h,amount:Math.round((hAmt-take)*1e8)/1e8};
+          });
+        }
+        return{...acc,holdings:hs};
+      });
+      const next={...prev,accounts,fxHistory:prev.fxHistory.filter(f=>f.id!==id)};
+      saveData(next);setSaved(true);setTimeout(()=>setSaved(false),1500);
+      return next;
+    });
+  };
 
   // ── 转账操作 ──────────────────────────────────────────
   const addTransfer=transfer=>{

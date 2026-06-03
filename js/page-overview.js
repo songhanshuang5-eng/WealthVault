@@ -258,12 +258,20 @@ function AccSummaryCard({acc,baseCur}){
       ${(acc.holdings||[]).length>0&&html`
         <div className="acc-body">
           ${hasLiab&&html`<div className="txs tm mb4" style=${{paddingTop:4}}>存款</div>`}
-          ${(acc.holdings||[]).map(h=>html`
-            <div key=${h.currency} className="hold-row">
-              <div><div className="hold-cur">${h.currency}</div><div className="hold-name">${CUR_NAMES[h.currency]}</div></div>
-              <div className="hold-amt">${CUR_SYM[h.currency]}${fmtNum(h.amount)}</div>
-            </div>
-          `)}
+          ${(()=>{
+            // 同银行同币种合并显示
+            const merged={};
+            (acc.holdings||[]).forEach(h=>{
+              const cur=h.currency;
+              merged[cur]=(merged[cur]||0)+Number(h.amount||0);
+            });
+            return Object.entries(merged).map(([cur,amt])=>html`
+              <div key=${cur} className="hold-row">
+                <div><div className="hold-cur">${cur}</div><div className="hold-name">${CUR_NAMES[cur]}</div></div>
+                <div className="hold-amt">${CUR_SYM[cur]}${fmtNum(amt)}</div>
+              </div>
+            `);
+          })()}
           ${hasLiab&&html`<${React.Fragment}>
             <div className="txs mb4" style=${{color:'var(--err)',paddingTop:8}}>负债</div>
             ${(acc.liabilities||[]).map(l=>html`

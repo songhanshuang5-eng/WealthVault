@@ -193,21 +193,32 @@ function HoldingModal({acc,editHolding,onSave,onClose}){
     startDate:editHolding?(editHolding.startDate||today):today,
     maturityDate:editHolding?(editHolding.maturityDate||''):'',
     note:editHolding?(editHolding.note||''):'',
+    entryDate:editHolding?(editHolding.entryDate||today):today,
+    summary:editHolding?(editHolding.summary||''):'',
   });
+  const [dupWarn,setDupWarn]=useState(false);
   const set=k=>e=>sf(x=>({...x,[k]:e.target.value}));
   const preview=(f.depositType!=='none'&&f.amount&&f.interestRate&&f.startDate)
     ?calcDepositInterest({...f,amount:Number(f.amount),interestRate:Number(f.interestRate)})
     :null;
-  const submit=()=>{
-    if(!f.amount||Number(f.amount)<=0)return;
-    const h={currency:f.currency,amount:Number(f.amount)};
+  const buildHolding=()=>{
+    const h={currency:f.currency,amount:Number(f.amount),entryDate:f.entryDate,summary:f.summary.trim()};
     if(editHolding&&editHolding.id)h.id=editHolding.id;
     if(f.depositType!=='none'&&f.interestRate&&f.startDate){
       h.depositType=f.depositType;h.interestRate=Number(f.interestRate);h.startDate=f.startDate;
       if(f.depositType==='fixed'&&f.maturityDate)h.maturityDate=f.maturityDate;
     }
     if(f.note.trim())h.note=f.note.trim();
-    onSave(h);
+    return h;
+  };
+  const submit=()=>{
+    if(!f.amount||Number(f.amount)<=0)return;
+    // 新增时检查重复入账（同日期 + 同金额）
+    if(!editHolding){
+      const dup=(acc.holdings||[]).some(h=>h.entryDate===f.entryDate&&Number(h.amount)===Number(f.amount)&&h.currency===f.currency);
+      if(dup&&!dupWarn){setDupWarn(true);return;}
+    }
+    onSave(buildHolding());
   };
   return html`
     <div className="overlay" onClick=${e=>e.target===e.currentTarget&&onClose()}>
@@ -221,7 +232,15 @@ function HoldingModal({acc,editHolding,onSave,onClose}){
             </select>
           </div>
           <div className="inp-group"><div className="inp-label">持有金额 *</div>
-            <input className="inp" type="number" step="any" min="0" placeholder="输入金额" value=${f.amount} onChange=${set('amount')}/>
+            <input className="inp" type="number" step="any" min="0" placeholder="输入金额" value=${f.amount} onChange=${e=>{sf(x=>({...x,amount:e.target.value}));setDupWarn(false);}}/>
+          </div>
+        </div>
+        <div className="modal-row">
+          <div className="inp-group"><div className="inp-label">入账日期 *</div>
+            <input className="inp" type="date" value=${f.entryDate} onChange=${e=>{sf(x=>({...x,entryDate:e.target.value}));setDupWarn(false);}}/>
+          </div>
+          <div className="inp-group"><div className="inp-label">摘要（可选）</div>
+            <input className="inp" placeholder="例：工资、租金收入" value=${f.summary} onChange=${set('summary')}/>
           </div>
         </div>
         <div className="inp-group"><div className="inp-label">存款类型</div>
@@ -263,6 +282,15 @@ function HoldingModal({acc,editHolding,onSave,onClose}){
         <div className="inp-group"><div className="inp-label">备注（可选）</div>
           <input className="inp" placeholder="例：招行一年期定存、2024年春节特惠利率" value=${f.note} onChange=${set('note')}/>
         </div>
+        ${dupWarn&&html`
+          <div className="alert alert-warn" style=${{marginBottom:12}}>
+            ⚠ 检测到同一日期（${f.entryDate}）已有相同金额（${CUR_SYM[f.currency]}${fmtNum(Number(f.amount))} ${f.currency}）的入账记录，是否重复入账？
+            <div className="fc g8 mt8">
+              <button className="btn btn-danger btn-sm" onClick=${()=>{setDupWarn(false);onSave(buildHolding());}}>确认保存（非重复）</button>
+              <button className="btn btn-ghost btn-sm" onClick=${()=>setDupWarn(false)}>取消</button>
+            </div>
+          </div>
+        `}
         <div className="modal-footer">
           <button className="btn btn-ghost" onClick=${onClose}>取消</button>
           <button className="btn btn-gold" onClick=${submit} disabled=${!f.amount||Number(f.amount)<=0}>保存</button>
