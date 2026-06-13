@@ -56,10 +56,22 @@ function TransferPage({data,addTransfer,deleteTransfer}){
                       </select>
                     </div>
                     <div className="inp-group">
-                      <div className="inp-label">转账金额${maxAmt>0?' （可用: '+(CUR_SYM[form.currency]||'')+fmtNum(maxAmt)+'）':''}</div>
-                      <input className="inp" type="number" step="any" min="0" placeholder="输入金额" value=${form.amount} onChange=${sf('amount')}/>
+                      <div className="inp-label">转账金额</div>
+                      <input className="inp" type="number" step="any" min="0" placeholder="输入金额"
+                        value=${form.amount}
+                        style=${{borderColor:form.amount&&Number(form.amount)>maxAmt?'var(--err)':undefined}}
+                        onChange=${sf('amount')}/>
                     </div>
                   </div>
+                  ${form.currency&&html`
+                    <div style=${{background:'var(--bg3)',borderRadius:8,padding:'10px 14px',marginBottom:12,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                      <span className="txs tm">可转余额（${form.currency}）</span>
+                      <span className="fh fn" style=${{fontSize:18,color:maxAmt>0?'var(--gold)':'var(--muted)'}}>
+                        ${CUR_SYM[form.currency]||''}${fmtNum(maxAmt)}
+                        <span className="txs tm" style=${{fontSize:11,marginLeft:4}}>${form.currency}</span>
+                      </span>
+                    </div>
+                  `}
                   <div className="modal-row">
                     <div className="inp-group"><div className="inp-label">转账日期</div><input className="inp" type="date" value=${form.date} onChange=${sf('date')}/></div>
                     <div className="inp-group"><div className="inp-label">备注（可选）</div><input className="inp" placeholder="例：月度归集" value=${form.note} onChange=${sf('note')}/></div>

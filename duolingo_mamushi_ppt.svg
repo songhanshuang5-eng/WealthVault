@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" font-family="'Arial', sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0c29"/>
+      <stop offset="50%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="greenGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#58cc02"/>
+      <stop offset="100%" style="stop-color:#89e219"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f7971e"/>
+      <stop offset="100%" style="stop-color:#ffd200"/>
+    </linearGradient>
+    <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f953c6"/>
+      <stop offset="100%" style="stop-color:#ff6eb4"/>
+    </linearGradient>
+    <linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f953c6"/>
+      <stop offset="100%" style="stop-color:#ffd200"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" fill="url(#bg)" rx="18"/>
+
+  <!-- Subtle grid pattern -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.2" opacity="0.08"/>
+  </pattern>
+  <rect width="900" height="520" fill="url(#grid)" rx="18"/>
+
+  <!-- Decorative stars -->
+  <text x="50" y="70" font-size="20" fill="#ffd200" opacity="0.5" filter="url(#glow)">★</text>
+  <text x="820" y="100" font-size="14" fill="#ffd200" opacity="0.3">★</text>
+  <text x="860" y="300" font-size="24" fill="#f953c6" opacity="0.4" filter="url(#glow)">★</text>
+  <text x="30" y="380" font-size="12" fill="#ffd200" opacity="0.3">★</text>
+  <text x="780" y="450" font-size="16" fill="#58cc02" opacity="0.4">★</text>
+  <text x="450" y="25" font-size="10" fill="#ffd200" opacity="0.25">★</text>
+
+  <!-- ── LEFT PANEL: Mamushi / Megan ── -->
+  <rect x="30" y="70" width="340" height="380" fill="white" rx="16" opacity="0.05"/>
+  <rect x="30" y="70" width="340" height="380" fill="none" stroke="#f953c6" stroke-width="1.5" rx="16" opacity="0.5"/>
+
+  <!-- TikTok label -->
+  <rect x="55" y="88" width="90" height="24" fill="#f953c6" rx="12"/>
+  <text x="100" y="104" text-anchor="middle" font-size="11" font-weight="bold" fill="white">🎵 TikTok</text>
+
+  <!-- Song title -->
+  <text x="200" y="140" text-anchor="middle" font-size="26" font-weight="bold" fill="url(#goldGrad)" filter="url(#glow)">MAMUSHI</text>
+  <text x="200" y="163" text-anchor="middle" font-size="12" fill="#aaa" letter-spacing="2">Megan Thee Stallion ft. Yuki Chiba</text>
+
+  <!-- Big lyric -->
+  <text x="200" y="210" text-anchor="middle" font-size="19" fill="white" font-style="italic">"I get money —</text>
+  <text x="200" y="243" text-anchor="middle" font-size="28" font-weight="bold" fill="url(#goldGrad)" filter="url(#softglow)">I'm a ★ STAR"</text>
+
+  <!-- Japanese -->
+  <rect x="100" y="260" width="200" height="38" fill="white" rx="8" opacity="0.08"/>
+  <text x="200" y="277" text-anchor="middle" font-size="16" fill="#c9a0ff" letter-spacing="3">私はスター</text>
+  <text x="200" y="293" text-anchor="middle" font-size="11" fill="#888">"I am a star"  (Japanese)</text>
+
+  <!-- Stats -->
+  <text x="200" y="335" text-anchor="middle" font-size="13" fill="#ddd">📱 300,000+ TikTok videos</text>
+  <text x="200" y="358" text-anchor="middle" font-size="13" fill="#ddd">🌏 Went viral in 📍Japan · UK · US</text>
+  <text x="200" y="381" text-anchor="middle" font-size="13" fill="#ddd">💃 Dance by @mona712_official</text>
+  <text x="200" y="404" text-anchor="middle" font-size="13" fill="#ddd">👁 43M views on Megan's own post</text>
+
+  <!-- ── CENTER ARROW ── -->
+  <!-- Arrow body -->
+  <rect x="388" y="238" width="124" height="36" fill="url(#arrowGrad)" rx="18" filter="url(#shadow)"/>
+  <polygon points="512,230 545,256 512,282" fill="url(#arrowGrad)" filter="url(#shadow)"/>
+  <text x="450" y="261" text-anchor="middle" font-size="13" font-weight="bold" fill="white">TRIGGERS</text>
+
+  <!-- AP Micro label in center -->
+  <rect x="370" y="300" width="160" height="50" fill="white" rx="10" opacity="0.08"/>
+  <text x="450" y="322" text-anchor="middle" font-size="11" fill="#ffd200" font-weight="bold">📈 AP Micro Effect</text>
+  <text x="450" y="340" text-anchor="middle" font-size="10" fill="#aaa">Demand Curve</text>
+  <text x="450" y="354" text-anchor="middle" font-size="10" fill="#58cc02" font-weight="bold">Shifts Rightward →</text>
+
+  <!-- ── RIGHT PANEL: Duolingo ── -->
+  <rect x="530" y="70" width="340" height="380" fill="white" rx="16" opacity="0.05"/>
+  <rect x="530" y="70" width="340" height="380" fill="none" stroke="#58cc02" stroke-width="1.5" rx="16" opacity="0.5"/>
+
+  <!-- Duolingo label -->
+  <rect x="555" y="88" width="110" height="24" fill="#58cc02" rx="12"/>
+  <text x="610" y="104" text-anchor="middle" font-size="11" font-weight="bold" fill="white">🦉 Duolingo</text>
+
+  <!-- Duolingo owl emoji large -->
+  <text x="700" y="170" text-anchor="middle" font-size="72" filter="url(#glow)">🦉</text>
+
+  <!-- Result headline -->
+  <text x="700" y="220" text-anchor="middle" font-size="15" fill="white" font-weight="bold">Japanese Course Signups</text>
+  <text x="700" y="244" text-anchor="middle" font-size="36" font-weight="bold" fill="url(#greenGlow)" filter="url(#softglow)">SPIKED 📈</text>
+
+  <!-- Stats bars -->
+  <!-- Bar 1: Before -->
+  <text x="565" y="292" font-size="11" fill="#888">Before Mamushi</text>
+  <rect x="565" y="298" width="100" height="18" fill="#333" rx="4"/>
+  <rect x="565" y="298" width="60" height="18" fill="#555" rx="4"/>
+  <text x="632" y="311" font-size="11" fill="#aaa">baseline</text>
+
+  <!-- Bar 2: After -->
+  <text x="565" y="332" font-size="11" fill="#58cc02" font-weight="bold">After Mamushi viral</text>
+  <rect x="565" y="338" width="240" height="18" fill="#58cc02" rx="4" opacity="0.9"/>
+  <text x="812" y="351" font-size="11" fill="#58cc02" font-weight="bold">▲▲▲</text>
+
+  <!-- Zero ad spend callout -->
+  <rect x="565" y="372" width="280" height="40" fill="#58cc02" rx="10" opacity="0.15"/>
+  <rect x="565" y="372" width="280" height="40" fill="none" stroke="#58cc02" stroke-width="1" rx="10" opacity="0.5"/>
+  <text x="705" y="390" text-anchor="middle" font-size="13" fill="#58cc02" font-weight="bold">💸 $0 Ad Spend by Duolingo</text>
+  <text x="705" y="406" text-anchor="middle" font-size="11" fill="#aaa">Pure emotional value spillover</text>
+
+  <text x="700" y="432" text-anchor="middle" font-size="12" fill="#ddd">Users chased the "star" feeling</text>
+  <text x="700" y="450" text-anchor="middle" font-size="12" fill="#ddd">→ wanted to sing in Japanese too</text>
+
+  <!-- ── BOTTOM SUMMARY BAR ── -->
+  <rect x="30" y="468" width="840" height="40" fill="white" rx="10" opacity="0.07"/>
+  <rect x="30" y="468" width="840" height="40" fill="none" stroke="url(#arrowGrad)" stroke-width="1" rx="10" opacity="0.4"/>
+
+  <text x="80" y="483" font-size="11" fill="#f953c6" font-weight="bold">🎵 Viral Song</text>
+  <text x="80" y="499" font-size="11" fill="#aaa">Mamushi · 2024</text>
+
+  <text x="220" y="491" font-size="16" fill="url(#arrowGrad)">→</text>
+
+  <text x="270" y="483" font-size="11" fill="#ffd200" font-weight="bold">💡 Emotional Value</text>
+  <text x="270" y="499" font-size="11" fill="#aaa">"I want to be a star too"</text>
+
+  <text x="430" y="491" font-size="16" fill="url(#arrowGrad)">→</text>
+
+  <text x="480" y="483" font-size="11" fill="#58cc02" font-weight="bold">📈 Demand Shifts Right</text>
+  <text x="480" y="499" font-size="11" fill="#aaa">Duolingo Japanese course</text>
+
+  <text x="660" y="491" font-size="16" fill="url(#arrowGrad)">→</text>
+
+  <text x="710" y="483" font-size="11" fill="#c9a0ff" font-weight="bold">💰 P* ↑  &amp;  Q* ↑</text>
+  <text x="710" y="499" font-size="11" fill="#aaa">Producer surplus grows</text>
+
+</svg>

@@ -2,7 +2,21 @@ function DataPage({data,setData,exportData,importFile,loadDemo}){
   const [showChangePwd,setShowChangePwd]=useState(false);
   const [showChangeUser,setShowChangeUser]=useState(false);
   const [importStatus,setImportStatus]=useState(null);
+  const [syncStatus,setSyncStatus]=useState(null); // {ok,msg}
+  const [syncing,setSyncing]=useState(null);        // 'push' | 'pull' | null
   const fileRef=useRef(null);
+
+  const onPush=async()=>{
+    setSyncing('push');setSyncStatus(null);
+    const result=await pushToServer(data);
+    setSyncStatus(result);setSyncing(null);
+  };
+  const onPull=async()=>{
+    if(!confirm('从服务器拉取数据将覆盖本机当前数据，确认继续？'))return;
+    setSyncing('pull');setSyncStatus(null);
+    const result=await pullFromServer(setData);
+    setSyncStatus(result);setSyncing(null);
+  };
 
   const onFileChange=e=>{
     const file=e.target.files?.[0];if(!file)return;
@@ -22,7 +36,36 @@ function DataPage({data,setData,exportData,importFile,loadDemo}){
   return html`
     <div>
       <div className="mb20"><div className="pg-title">数据管理</div><div className="pg-sub">数据自动保存在本地浏览器中</div></div>
-      <div className="alert alert-ok mb20">✅ 数据自动保存在本机浏览器（localStorage）中，关闭页面后依然保留。建议定期导出 JSON 作为备份。</div>
+      <div className="alert alert-ok mb20">✅ 数据自动保存在本机浏览器中。手机与电脑之间可通过下方"多设备同步"手动同步数据。</div>
+
+      <div className="card mb16">
+        <div className="fw6 mb4">☁️ 多设备同步</div>
+        <div className="ts tm mb14">手机与电脑连接同一 Wi-Fi，通过服务器互传数据。</div>
+        <div style=${{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}>
+          <div style=${{background:'var(--bg3)',borderRadius:10,padding:'14px 16px'}}>
+            <div className="ts fw6 mb4">📤 推送到服务器</div>
+            <div className="txs tm mb10">把本机数据上传，另一台设备再拉取</div>
+            <button className="btn btn-gold btn-w" onClick=${onPush} disabled=${syncing==='push'}>
+              ${syncing==='push'?'推送中…':'推送本机数据'}
+            </button>
+          </div>
+          <div style=${{background:'var(--bg3)',borderRadius:10,padding:'14px 16px'}}>
+            <div className="ts fw6 mb4">📥 从服务器拉取</div>
+            <div className="txs tm mb10">覆盖本机数据为服务器上的版本</div>
+            <button className="btn btn-ghost btn-w" onClick=${onPull} disabled=${syncing==='pull'}>
+              ${syncing==='pull'?'拉取中…':'拉取最新数据'}
+            </button>
+          </div>
+        </div>
+        ${syncStatus&&html`
+          <div style=${{
+            padding:'8px 12px',borderRadius:7,fontSize:13,
+            background:syncStatus.ok?'rgba(82,214,138,.08)':'rgba(240,128,128,.08)',
+            color:syncStatus.ok?'var(--ok)':'var(--err)',
+            border:syncStatus.ok?'1px solid rgba(82,214,138,.2)':'1px solid rgba(240,128,128,.2)'
+          }}>${syncStatus.msg}</div>
+        `}
+      </div>
       <div className="g2 mb16">
         ${stats.map(s=>html`<div key=${s.label} className="stat-box"><div className="stat-lbl">${s.label}</div><div className="stat-val">${s.val}</div></div>`)}
       </div>

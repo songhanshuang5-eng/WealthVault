@@ -133,6 +133,29 @@ function Overview({data,totals,grandTotal,grandAsset,grandLiab,unlinkedInvTotal,
                 <div className="total-amt" style=${{color:grandTotal>=0?'var(--gold)':'var(--err)'}}>${grandTotal<0?'-':''}${CUR_SYM[baseCur]}${fmtNum(Math.abs(grandTotal))}</div>
                 <div className="total-cur">${baseCur} · ${CUR_NAMES[baseCur]}</div>
               </div>
+              ${(()=>{
+                const thisMonth=new Date().toISOString().slice(0,7);
+                const monthly=(data.expenses||[]).filter(e=>e.date.slice(0,7)===thisMonth);
+                if(monthly.length===0)return null;
+                // 按货币汇总
+                const byC={};
+                monthly.forEach(e=>{byC[e.currency]=(byC[e.currency]||0)+Number(e.amount);});
+                return html`
+                  <div style=${{display:'flex',alignItems:'center',justifyContent:'space-between',
+                    background:'rgba(240,128,128,.06)',border:'1px solid rgba(240,128,128,.15)',
+                    borderRadius:8,padding:'8px 14px',marginTop:10,flexWrap:'wrap',gap:6}}>
+                    <span className="txs tm">💸 本月支出</span>
+                    <div className="fc g10">
+                      ${Object.entries(byC).map(([cur,amt])=>html`
+                        <span key=${cur} className="fn ts" style=${{color:'var(--err)'}}>
+                          ${CUR_SYM[cur]||''}${fmtNum(amt)} ${cur}
+                        </span>
+                      `)}
+                      <span className="txs tm">${monthly.length} 笔</span>
+                    </div>
+                  </div>
+                `;
+              })()}
             </${React.Fragment}>`}
           </div>
 

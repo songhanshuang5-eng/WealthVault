@@ -1,5 +1,5 @@
 // 每次更新JS文件后，把版本号+1，手机会自动拉取新版本
-const CACHE = 'wealthvault-v4';
+const CACHE = 'wealthvault-v23';
 
 const FILES = [
   './',
@@ -14,8 +14,13 @@ const FILES = [
   './js/vendor/htm.umd.js',
   // 应用脚本
   './js/utils.js',
+  './js/components-charts.js',
+  './js/components-settings.js',
+  './js/components-tx.js',
+  './js/components-account.js',
+  './js/components-liability.js',
+  './js/components-investment.js',
   './js/auth.js',
-  './js/components.js',
   './js/page-overview.js',
   './js/page-accounts.js',
   './js/page-investments.js',

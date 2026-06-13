@@ -1,3 +1,6 @@
+# 用户数据（含个人财务信息，不提交）
+userdata/
+
 # 自动生成的 SSL 证书（本地开发用，不提交）
 server.crt
 server.key

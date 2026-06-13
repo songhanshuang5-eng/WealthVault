@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" font-family="Georgia, serif">
+
+  <!-- Background -->
+  <rect width="760" height="520" fill="#f8f9fc" rx="14"/>
+
+  <!-- Title -->
+  <text x="380" y="38" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a1a2e">Jet2 Annual Revenue Growth (2023–2026)</text>
+  <text x="380" y="60" text-anchor="middle" font-size="13" fill="#666">Revenue in £ Billions · Fiscal Year ending March 31</text>
+
+  <!-- Y axis gridlines & labels -->
+  <!-- Max ~8B, grid every 1B. Chart area: x:100-700, y:90-430 (height 340px = 8B) -->
+  <!-- Scale: 1B = 42.5px -->
+
+  <!-- Gridlines -->
+  <line x1="100" y1="430" x2="700" y2="430" stroke="#ddd" stroke-width="1"/>
+  <line x1="100" y1="387.5" x2="700" y2="387.5" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="345" x2="700" y2="345" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="302.5" x2="700" y2="302.5" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="260" x2="700" y2="260" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="217.5" x2="700" y2="217.5" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="175" x2="700" y2="175" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="132.5" x2="700" y2="132.5" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="100" y1="90" x2="700" y2="90" stroke="#ddd" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Y axis labels -->
+  <text x="90" y="434" text-anchor="end" font-size="12" fill="#888">£0B</text>
+  <text x="90" y="391" text-anchor="end" font-size="12" fill="#888">£1B</text>
+  <text x="90" y="349" text-anchor="end" font-size="12" fill="#888">£2B</text>
+  <text x="90" y="306" text-anchor="end" font-size="12" fill="#888">£3B</text>
+  <text x="90" y="264" text-anchor="end" font-size="12" fill="#888">£4B</text>
+  <text x="90" y="221" text-anchor="end" font-size="12" fill="#888">£5B</text>
+  <text x="90" y="179" text-anchor="end" font-size="12" fill="#888">£6B</text>
+  <text x="90" y="136" text-anchor="end" font-size="12" fill="#888">£7B</text>
+  <text x="90" y="94" text-anchor="end" font-size="12" fill="#888">£8B</text>
+
+  <!-- Y axis line -->
+  <line x1="100" y1="85" x2="100" y2="435" stroke="#aaa" stroke-width="1.5"/>
+
+  <!-- Bars: 4 years, evenly spaced in 100-700 range -->
+  <!-- Each bar width=90, centers at 187.5, 337.5, 487.5, 637.5 -->
+  <!-- Heights: 2023=5.03B → 213.8px, 2024=6.25B→265.6px, 2025=7.17B→304.7px, 2026=7.43B→315.8px -->
+
+  <!-- 2023 bar: £5.03B → height=213.6, y=430-213.6=216.4 -->
+  <rect x="143" y="216" width="90" height="214" fill="#4a90d9" rx="4"/>
+  <text x="188" y="208" text-anchor="middle" font-size="13" font-weight="bold" fill="#4a90d9">£5.03B</text>
+  <text x="188" y="458" text-anchor="middle" font-size="13" fill="#333" font-weight="bold">FY2023</text>
+
+  <!-- 2024 bar: £6.25B → height=265.6, y=430-265.6=164.4 -->
+  <rect x="293" y="164" width="90" height="266" fill="#2ecc71" rx="4"/>
+  <text x="338" y="156" text-anchor="middle" font-size="13" font-weight="bold" fill="#27ae60">£6.25B</text>
+  <text x="338" y="458" text-anchor="middle" font-size="13" fill="#333" font-weight="bold">FY2024</text>
+
+  <!-- 2025 bar: £7.17B → height=304.7, y=430-304.7=125.3 -->
+  <rect x="443" y="125" width="90" height="305" fill="#e67e22" rx="4"/>
+  <text x="488" y="117" text-anchor="middle" font-size="13" font-weight="bold" fill="#d35400">£7.17B</text>
+  <text x="488" y="458" text-anchor="middle" font-size="13" fill="#333" font-weight="bold">FY2025</text>
+
+  <!-- 2026 bar (estimate): £7.43B → height=315.8, y=430-315.8=114.2 -->
+  <rect x="593" y="114" width="90" height="316" fill="#9b59b6" rx="4" opacity="0.85" stroke-dasharray="0"/>
+  <!-- Hatching to indicate estimate -->
+  <rect x="593" y="114" width="90" height="316" fill="url(#hatch)" rx="4" opacity="0.3"/>
+  <text x="638" y="106" text-anchor="middle" font-size="13" font-weight="bold" fill="#8e44ad">£7.43B*</text>
+  <text x="638" y="458" text-anchor="middle" font-size="13" fill="#333" font-weight="bold">FY2026</text>
+  <text x="638" y="472" text-anchor="middle" font-size="11" fill="#999">(est.)</text>
+
+  <defs>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="white" stroke-width="3"/>
+    </pattern>
+  </defs>
+
+  <!-- Growth arrows between bars -->
+  <!-- 2023→2024: +24.3% -->
+  <text x="263" y="185" text-anchor="middle" font-size="11" fill="#27ae60">▲ +24%</text>
+  <!-- 2024→2025: +14.7% -->
+  <text x="413" y="145" text-anchor="middle" font-size="11" fill="#d35400">▲ +15%</text>
+  <!-- 2025→2026: +3.6% -->
+  <text x="563" y="125" text-anchor="middle" font-size="11" fill="#8e44ad">▲ +4%</text>
+
+  <!-- Bottom note -->
+  <rect x="100" y="485" width="560" height="26" fill="#eef2ff" rx="6"/>
+  <text x="380" y="502" text-anchor="middle" font-size="12" fill="#555">
+    * FY2026 based on TTM (trailing twelve months) as of Sep 2025 · Source: companiesmarketcap.com
+  </text>
+
+  <!-- Legend -->
+  <rect x="540" y="92" width="14" height="14" fill="#9b59b6" rx="2" opacity="0.85"/>
+  <rect x="540" y="92" width="14" height="14" fill="url(#hatch)" rx="2" opacity="0.3"/>
+  <text x="560" y="103" font-size="11" fill="#666">= Estimated</text>
+
+</svg>

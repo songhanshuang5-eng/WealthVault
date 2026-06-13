@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WealthVault · 用户手册</title>
+<style>
+:root{
+  --bg:#0D1117;--bg2:#161B22;--bg3:#1E2630;
+  --gold:#C9A043;--ok:#52C87A;--err:#F08080;
+  --text:#E6EDF3;--muted:#6E7A90;--border:rgba(255,255,255,.08);
+  --blue:#4A90D9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.7}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* 布局 */
+.wrap{display:flex;min-height:100vh}
+.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.content{flex:1;padding:40px 48px;max-width:860px}
+
+/* 侧边栏 */
+.sidebar-title{padding:0 20px 16px;font-size:16px;font-weight:700;color:var(--gold);border-bottom:1px solid var(--border);margin-bottom:12px}
+.sidebar-title span{font-size:11px;color:var(--muted);display:block;font-weight:400;margin-top:2px}
+.toc-section{padding:8px 20px 4px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:8px}
+.toc a{display:block;padding:5px 20px 5px 28px;font-size:13px;color:var(--muted);border-left:2px solid transparent;transition:all .15s}
+.toc a:hover,.toc a.active{color:var(--text);border-left-color:var(--gold);background:rgba(201,160,67,.06);text-decoration:none}
+
+/* 内容 */
+h1{font-size:28px;font-weight:700;color:var(--gold);margin-bottom:8px}
+h2{font-size:20px;font-weight:700;margin:40px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border);color:var(--text)}
+h3{font-size:15px;font-weight:600;margin:24px 0 10px;color:var(--gold)}
+h4{font-size:13px;font-weight:600;margin:16px 0 6px;color:var(--muted)}
+p{margin-bottom:12px;color:var(--text)}
+ul,ol{margin:0 0 12px 20px}
+li{margin-bottom:4px}
+code{background:var(--bg3);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:12px;color:var(--gold)}
+
+/* 提示框 */
+.note{background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.25);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px}
+.note::before{content:'💡 ';font-size:14px}
+.warn{background:rgba(240,128,128,.08);border:1px solid rgba(240,128,128,.2);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px}
+.warn::before{content:'⚠️ ';font-size:14px}
+.tip{background:rgba(82,200,122,.08);border:1px solid rgba(82,200,122,.2);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px}
+.tip::before{content:'✅ ';font-size:14px}
+
+/* 步骤 */
+.steps{counter-reset:step;margin:12px 0}
+.step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
+.step-num{background:var(--gold);color:#000;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+
+/* 界面模拟 */
+.mock-page{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;font-size:13px}
+.mock-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mock-title{font-size:18px;font-weight:700}
+.mock-sub{font-size:12px;color:var(--muted)}
+.mock-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.mock-card.green{border-left:3px solid var(--ok)}
+.mock-card.gold{border-left:3px solid var(--gold)}
+.mock-card.red{border-left:3px solid var(--err)}
+.mock-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.mock-row:last-child{border-bottom:none}
+.mock-label{color:var(--muted);font-size:12px}
+.mock-val{font-weight:600;font-family:monospace}
+.pos{color:var(--ok)}
+.neg{color:var(--err)}
+.gold-val{color:var(--gold)}
+.mock-tag{display:inline-block;padding:1px 8px;border-radius:4px;font-size:11px;margin-right:4px}
+.tag-blue{background:rgba(74,144,217,.15);color:#4A90D9}
+.tag-ok{background:rgba(82,200,122,.15);color:var(--ok)}
+.tag-err{background:rgba(240,128,128,.15);color:var(--err)}
+.tag-gold{background:rgba(201,160,67,.15);color:var(--gold)}
+.mock-btn{display:inline-block;padding:4px 12px;border-radius:6px;font-size:12px;cursor:default;border:1px solid}
+.btn-g{background:rgba(201,160,67,.15);color:var(--gold);border-color:rgba(201,160,67,.3)}
+.btn-ok{background:rgba(82,200,122,.12);color:var(--ok);border-color:rgba(82,200,122,.25)}
+.btn-err{background:rgba(240,128,128,.12);color:var(--err);border-color:rgba(240,128,128,.25)}
+.btn-ghost{background:transparent;color:var(--muted);border-color:rgba(255,255,255,.15)}
+.mock-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mock-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.mock-stat{background:var(--bg3);border-radius:8px;padding:10px 12px}
+.mock-stat-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.mock-stat-val{font-size:16px;font-weight:700;font-family:monospace}
+.mock-banner{background:rgba(82,200,122,.08);border:1px solid rgba(82,200,122,.25);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.mock-banner-red{background:rgba(240,128,128,.08);border:1px solid rgba(240,128,128,.25);border-radius:8px;padding:10px 14px;margin-bottom:10px}
+.divider{height:1px;background:var(--border);margin:32px 0}
+
+/* 导航标签 */
+.mock-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.mock-tab{padding:6px 14px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent}
+.mock-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th{text-align:left;padding:8px 12px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px}
+tr:last-child td{border-bottom:none}
+
+.section-intro{font-size:15px;color:var(--muted);margin-bottom:24px;line-height:1.8}
+.kbd{display:inline-block;background:var(--bg3);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:1px 7px;font-size:12px;font-family:monospace}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- 侧边栏 -->
+<nav class="sidebar">
+  <div class="sidebar-title">WealthVault<span>用户手册 v1.0</span></div>
+  <div class="toc">
+    <div class="toc-section">入门</div>
+    <a href="#install">1. 安装与启动</a>
+    <a href="#intro">2. 产品简介</a>
+    <a href="#login">3. 登录与安全</a>
+    <a href="#overview-tab">4. 总览</a>
+
+    <div class="toc-section">账户</div>
+    <a href="#accounts">4. 银行账户</a>
+    <a href="#holdings">5. 存款管理</a>
+    <a href="#liabilities">6. 负债管理</a>
+    <a href="#expenses">7. 支出记录</a>
+    <a href="#income-plans">8. 定期收入计划</a>
+
+    <div class="toc-section">投资</div>
+    <a href="#investments">9. 投资持仓</a>
+    <a href="#fixed-inv">10. 固定收益</a>
+    <a href="#var-inv">11. 非固定收益</a>
+    <a href="#trades">12. 仓位操作</a>
+    <a href="#dividends">13. 分红记录</a>
+    <a href="#clear-pos">14. 清仓</a>
+    <a href="#benchmarks">15. 对比基准</a>
+
+    <div class="toc-section">工具</div>
+    <a href="#fx">16. 货币兑换</a>
+    <a href="#transfer">17. 资金转账</a>
+    <a href="#privacy">18. 隐私模式</a>
+    <a href="#backup">19. 数据备份</a>
+  </div>
+</nav>
+
+<!-- 主内容 -->
+<main class="content">
+
+<!-- 0 安装与启动 -->
+<section id="install">
+<h1>WealthVault 用户手册</h1>
+<h2>1. 安装与启动</h2>
+<p class="section-intro">WealthVault 是一个纯前端本地应用，无需安装任何软件，只需一个现代浏览器和 Python 3 即可运行。</p>
+
+<h3>三种使用方式</h3>
+<table>
+  <tr><th>场景</th><th>是否需要服务器</th><th>推荐方式</th></tr>
+  <tr><td>💻 电脑单独使用</td><td>❌ 不需要</td><td>直接双击 index.html 打开</td></tr>
+  <tr><td>💻📱 电脑 + 手机同时访问</td><td>✅ 需要</td><td>启动 Python 服务器，手机通过 IP 访问</td></tr>
+  <tr><td>📱 手机独立安装</td><td>✅ 一次性需要</td><td>通过服务器访问后，安装为 PWA 桌面 App</td></tr>
+</table>
+
+<div class="divider" style="margin:16px 0"></div>
+
+<h3>方式一：电脑直接打开（最简单）</h3>
+<p>直接在文件夹中<strong>双击 <code>index.html</code></strong>，浏览器会自动打开应用。Safari 和 Edge 完全正常；Chrome 会使用内置备用方案处理加密，不影响使用。</p>
+<div class="tip">建议将打开后的标签页加入书签，下次直接点书签即可，无需找文件。</div>
+
+<div class="divider" style="margin:16px 0"></div>
+
+<h3>方式二：启动服务器（电脑 + 手机同时用）</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div>
+    <div>打开终端，进入 WealthVault 文件夹：
+      <div style="background:var(--bg3);border-radius:6px;padding:10px 14px;margin-top:8px;font-family:monospace;font-size:13px;color:var(--ok)">
+        cd ~/Documents/WealthVault
+      </div>
+    </div>
+  </div>
+  <div class="step"><div class="step-num">2</div>
+    <div>启动本地服务器：
+      <div style="background:var(--bg3);border-radius:6px;padding:10px 14px;margin-top:8px;font-family:monospace;font-size:13px;color:var(--ok)">
+        python3 -m http.server 8282
+      </div>
+      看到 <code>Serving HTTP on 0.0.0.0 port 8282</code> 即表示成功。
+    </div>
+  </div>
+  <div class="step"><div class="step-num">3</div>
+    <div>
+      <b>电脑</b>访问：浏览器输入 <code style="color:var(--gold)">http://localhost:8282</code><br/>
+      <b>手机</b>访问：先查电脑的局域网 IP（终端运行 <code>ifconfig | grep "inet "</code> 或 Windows 运行 <code>ipconfig</code>），手机输入 <code style="color:var(--gold)">http://192.168.1.xxx:8282</code>
+    </div>
+  </div>
+</div>
+<p>终端窗口需保持开启，关闭终端即停止服务。按 <span class="kbd">Ctrl + C</span> 可手动停止。</p>
+
+<div class="divider" style="margin:16px 0"></div>
+
+<h3>方式三：手机安装为 App（PWA）</h3>
+<p>App 内置离线缓存（Service Worker），可安装到手机桌面像原生 App 一样使用，<strong>安装后不需要电脑开着服务器</strong>。</p>
+
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div>先按方式二启动服务器，手机浏览器访问 <code>http://192.168.1.xxx:8282</code></div></div>
+  <div class="step"><div class="step-num">2</div>
+    <div>
+      <b>iOS Safari</b>：点底部分享按钮 → 「添加到主屏幕」→「添加」<br/>
+      <b>Android Chrome</b>：点右上角菜单 → 「添加到主屏幕」或「安装应用」
+    </div>
+  </div>
+  <div class="step"><div class="step-num">3</div><div>桌面出现 WealthVault 图标，之后直接点图标启动，<b>无需浏览器、无需服务器</b>。</div></div>
+</div>
+
+<div class="tip">PWA 数据保存在手机浏览器的 localStorage 中，与电脑各自独立。如需同步，请使用「数据」页面导出 JSON 文件，在另一设备导入。</div>
+<div class="warn">iOS 清除网站数据或卸载后 localStorage 会丢失，建议定期在 App 内备份导出。</div>
+
+<h3>停止服务器</h3>
+<p>在终端按 <span class="kbd">Ctrl + C</span>。仅在方式二（多设备联用）时才需要启动，方式一和安装后的 PWA 均不依赖服务器。</p>
+
+<h3>文件说明</h3>
+<table>
+  <tr><th>文件 / 文件夹</th><th>说明</th></tr>
+  <tr><td><code>index.html</code></td><td>应用主页面，浏览器打开此文件</td></tr>
+  <tr><td><code>manual.html</code></td><td>本用户手册</td></tr>
+  <tr><td><code>js/</code></td><td>应用逻辑代码，勿随意修改</td></tr>
+  <tr><td><code>js/vendor/</code></td><td>第三方库（React、HTM），无需联网</td></tr>
+</table>
+<div class="note">所有数据保存在浏览器 <code>localStorage</code> 中，不存在任何服务器上。重装系统或更换浏览器前请先导出备份（见第 19 章）。</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 1 产品简介 -->
+<section id="intro">
+<h1>WealthVault 用户手册</h1>
+<p class="section-intro">WealthVault 是一款本地运行的个人财富管理工具，所有数据保存在您的浏览器本地，不上传到任何服务器。</p>
+
+<h3>主要功能</h3>
+<table>
+  <tr><th>模块</th><th>功能</th></tr>
+  <tr><td>🏦 账户</td><td>多币种存款、负债、支出、定期收入计划</td></tr>
+  <tr><td>📈 投资</td><td>固定收益 / 非固定收益持仓、仓位操作、分红、清仓、基准对比</td></tr>
+  <tr><td>💱 汇率</td><td>货币兑换记录，自动更新账户余额</td></tr>
+  <tr><td>🔄 转账</td><td>账户间资金划转</td></tr>
+  <tr><td>📊 总览</td><td>净资产图表、资产分布、历史快照</td></tr>
+</table>
+</section>
+
+<div class="divider"></div>
+
+<!-- 2 登录 -->
+<section id="login">
+<h2>2. 登录与安全</h2>
+
+<h3>首次注册</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div>访问应用地址，点击「新用户注册 →」</div></div>
+  <div class="step"><div class="step-num">2</div><div>设置用户名（至少 2 个字符）和密码（至少 4 位）</div></div>
+  <div class="step"><div class="step-num">3</div><div>注册成功后自动登录</div></div>
+</div>
+
+<h3>日常登录</h3>
+<p>输入用户名和密码，点击「登 录」。登录成功后进入主界面，所有数字默认处于<strong>隐私模式</strong>（显示为 ***），点击右上角 🙈 可切换显示。</p>
+
+<div class="note">密码以 SHA-256 哈希形式存储在浏览器本地，无法被读取或恢复。如果忘记密码，只能通过「重置」功能清空数据后重新注册。</div>
+
+<h3>多用户</h3>
+<p>同一浏览器支持多个用户账号，每个用户的数据相互隔离。切换用户只需退出后以其他用户名登录。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 3 总览 -->
+<section id="overview-tab">
+<h2>3. 总览</h2>
+<p class="section-intro">总览是应用首页，展示当前总净资产、资产分布图和历史净资产趋势。</p>
+
+<div class="mock-page">
+  <div class="mock-tabs">
+    <div class="mock-tab active">📊 总览</div>
+    <div class="mock-tab">🏦 账户</div>
+    <div class="mock-tab">📈 投资</div>
+    <div class="mock-tab">💱 汇率</div>
+  </div>
+
+  <!-- 汇率设置 -->
+  <div class="mock-card">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">基准货币 / 汇率设置</div>
+    <div class="mock-row">
+      <span>基准货币</span>
+      <span style="background:var(--bg);padding:2px 10px;border-radius:4px;border:1px solid var(--border)">CNY ▼</span>
+    </div>
+    <div class="mock-row"><span class="mock-label">USD → CNY</span><span>7.2500</span></div>
+    <div class="mock-row"><span class="mock-label">HKD → CNY</span><span>0.9280</span></div>
+    <div class="mock-row"><span class="mock-label">CAD → CNY</span><span>5.3100</span></div>
+  </div>
+
+  <!-- 净资产 -->
+  <div style="text-align:center;padding:16px 0">
+    <div style="font-size:12px;color:var(--muted)">总净资产（CNY）</div>
+    <div style="font-size:32px;font-weight:700;color:var(--gold);font-family:monospace">¥ 1,258,430.00</div>
+    <div style="font-size:13px;color:var(--muted)">资产 ¥1,382,650 · 负债 ¥124,220</div>
+  </div>
+
+  <!-- 资产分布 -->
+  <div class="mock-grid">
+    <div class="mock-stat"><div class="mock-stat-label">按账户分布</div><div style="height:60px;background:var(--bg);border-radius:50%;width:60px;margin:4px auto;border:8px solid var(--gold)"></div></div>
+    <div class="mock-stat"><div class="mock-stat-label">按货币分布</div><div style="height:60px;background:var(--bg);border-radius:50%;width:60px;margin:4px auto;border:8px solid var(--blue)"></div></div>
+  </div>
+
+  <!-- 快照 -->
+  <div class="mock-card" style="margin-top:12px">
+    <div class="mock-row"><span>2026-04-01</span><span class="gold-val">¥1,125,000</span></div>
+    <div class="mock-row"><span>2026-05-01</span><span class="gold-val">¥1,198,500</span></div>
+    <div class="mock-row"><span>2026-06-01</span><span class="gold-val">¥1,258,430</span></div>
+  </div>
+</div>
+
+<h3>汇率设置</h3>
+<p>进入总览后先设置各外币对基准货币（默认 CNY）的汇率。点「一键获取」可自动从网络拉取最新汇率，也可以手动输入。</p>
+
+<h3>净资产快照</h3>
+<p>每月 1 号，App 在打开时会自动保存一条净资产快照（需汇率已设置）。也可在总览页点「添加快照」手动保存当前数值。</p>
+<div class="tip">建议设置完汇率后留在总览页片刻，让系统完成自动快照的计算。</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 4 账户 -->
+<section id="accounts">
+<h2>4. 银行账户</h2>
+
+<h3>添加账户</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div>点击右上角「+ 添加账户」</div></div>
+  <div class="step"><div class="step-num">2</div><div>填写账户名称、银行名称、卡号后四位（可选）、卡片颜色</div></div>
+  <div class="step"><div class="step-num">3</div><div>保存后账户出现在列表中</div></div>
+</div>
+
+<div class="mock-page">
+  <div class="mock-card gold">
+    <div class="mock-row">
+      <div>
+        <div style="font-weight:600">工行储蓄卡</div>
+        <div class="mock-label">中国工商银行 · 尾号 6688</div>
+      </div>
+      <div class="mock-val gold-val">¥ 352,500.00</div>
+    </div>
+  </div>
+  <div class="mock-card" style="border-left:3px solid #4A7FA5">
+    <div class="mock-row">
+      <div>
+        <div style="font-weight:600">汇丰 Premier</div>
+        <div class="mock-label">汇丰银行 · 尾号 5678</div>
+      </div>
+      <div class="mock-val gold-val">¥ 461,200.00</div>
+    </div>
+  </div>
+</div>
+
+<p>点击账户卡片可展开详情，查看各币种存款余额、关联投资持仓和负债项目。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 5 存款 -->
+<section id="holdings">
+<h2>5. 存款管理</h2>
+
+<p class="section-intro">每个账户可以有多条不同币种的存款记录，支持活期计息、定期计息和不计息（现金）三种类型。</p>
+
+<h3>添加存款</h3>
+<p>展开账户 → 点「+ 添加存款」，填写以下信息：</p>
+
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>货币</td><td>选择存款币种（USD / CNY / HKD 等）</td></tr>
+  <tr><td>持有金额</td><td>实际存款本金</td></tr>
+  <tr><td>入账日期</td><td>资金进入账户的日期</td></tr>
+  <tr><td>摘要</td><td>可选，例如「六月工资」</td></tr>
+  <tr><td>存款类型</td><td>不计息 / 活期 / 定期</td></tr>
+  <tr><td>年利率</td><td>选活期或定期时填写</td></tr>
+  <tr><td>起息日 / 到期日</td><td>定期存款需填写</td></tr>
+</table>
+
+<div class="mock-page">
+  <div style="font-size:12px;color:var(--muted);margin-bottom:8px">存款列表 — 工行储蓄卡</div>
+  <div class="mock-row">
+    <div>
+      <span style="font-weight:600">CNY</span>
+      <span class="mock-tag tag-blue">定期</span>
+      <div class="mock-label">2026-02-01 · 年利率 2.10%</div>
+      <div style="font-size:12px;color:var(--ok)">还有 45 天到期 · 已计 +¥ 562.30</div>
+    </div>
+    <div>
+      <div class="mock-val">¥ 100,000.00</div>
+    </div>
+  </div>
+  <div class="mock-row">
+    <div>
+      <span style="font-weight:600">USD</span>
+      <div class="mock-label">2026-01-15 · 月薪</div>
+    </div>
+    <div class="mock-val">$ 8,500.00</div>
+  </div>
+</div>
+
+<div class="note">系统会根据利率和天数自动计算已计利息，仅作展示，不会自动加入余额。实际利息在到期后手动结算或更新金额。</div>
+
+<h3>重复入账检测</h3>
+<p>同一账户同一天、同币种、同金额再次入账时，系统会弹出提醒，防止误操作。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 6 负债 -->
+<section id="liabilities">
+<h2>6. 负债管理</h2>
+
+<p class="section-intro">记录贷款、信用卡欠款等负债，系统自动计算每期还款额和剩余期数。</p>
+
+<h3>添加负债</h3>
+<p>展开账户 → 点「+ 添加负债」</p>
+
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>负债名称</td><td>例：住房贷款、汽车贷款</td></tr>
+  <tr><td>当前余额</td><td>剩余未还本金</td></tr>
+  <tr><td>年利率</td><td>贷款年化利率（%）</td></tr>
+  <tr><td>还款方式</td><td>每月 / 每季度 / 每年 / 到期一次性</td></tr>
+  <tr><td>到期日</td><td>贷款最终还清日期</td></tr>
+</table>
+
+<div class="mock-page">
+  <div class="mock-card red">
+    <div class="mock-row">
+      <div>
+        <span style="font-weight:600">住房贷款</span>
+        <span class="mock-tag tag-err" style="margin-left:6px">CNY</span>
+        <div class="mock-label">每月还款 · 年利率 3.80% · 到期 2035-08-01</div>
+        <div style="margin-top:6px;height:4px;background:var(--bg);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:28%;background:var(--err);border-radius:4px"></div>
+        </div>
+        <div class="mock-label">已还本金 ¥ 168,000（28%）</div>
+      </div>
+      <div>
+        <div class="mock-val neg">-¥ 432,000.00</div>
+        <div class="mock-label" style="text-align:right">月供 ¥ 4,280</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>记录还款</h3>
+<p>展开负债详情 → 点「💳 还款」，系统会自动将还款拆分为利息和本金，并从指定账户余额扣减。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 7 支出 -->
+<section id="expenses">
+<h2>7. 支出记录</h2>
+
+<p class="section-intro">在账户页记录日常支出，系统自动从指定账户余额扣减，并在月度汇总中展示。</p>
+
+<h3>记录支出</h3>
+<p>点击账户页右上角「💸 记支出」或账户卡片内「💸 记支出」按钮：</p>
+
+<div class="mock-page">
+  <div class="mock-card">
+    <div class="mock-row"><span class="mock-label">日期</span><span>2026-06-08</span></div>
+    <div class="mock-row"><span class="mock-label">金额</span><span class="neg">¥ 138.00</span></div>
+    <div class="mock-row"><span class="mock-label">账户</span><span>工行储蓄卡 · CNY</span></div>
+    <div class="mock-row"><span class="mock-label">分类</span><span class="mock-tag tag-err">餐饮</span></div>
+    <div class="mock-row"><span class="mock-label">备注</span><span>团队聚餐</span></div>
+  </div>
+</div>
+
+<h3>支出分类</h3>
+<p>系统内置 10 个分类，每个分类对应一种颜色便于区分：</p>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">
+  <span class="mock-tag" style="background:rgba(232,96,96,.15);color:#E86060">餐饮</span>
+  <span class="mock-tag" style="background:rgba(232,145,58,.15);color:#E8913A">购物</span>
+  <span class="mock-tag" style="background:rgba(74,144,217,.15);color:#4A90D9">交通</span>
+  <span class="mock-tag" style="background:rgba(201,160,67,.15);color:#C9A043">住房</span>
+  <span class="mock-tag" style="background:rgba(82,200,122,.15);color:#52C87A">生活</span>
+  <span class="mock-tag" style="background:rgba(123,104,238,.15);color:#7B68EE">医疗</span>
+  <span class="mock-tag" style="background:rgba(212,120,64,.15);color:#D47840">娱乐</span>
+  <span class="mock-tag" style="background:rgba(88,184,152,.15);color:#58B898">教育</span>
+  <span class="mock-tag" style="background:rgba(155,68,148,.15);color:#9B4494">旅行</span>
+  <span class="mock-tag" style="background:rgba(96,123,139,.15);color:#607B8B">其他</span>
+</div>
+
+<h3>月度汇总</h3>
+<p>账户页底部「支出记录」区块展示当月分类环形图、筛选器和历史支出列表，可按账户、分类、月份筛选。</p>
+<div class="tip">删除支出记录时，系统会自动将金额退回到原账户余额。</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 8 定期收入计划 -->
+<section id="income-plans">
+<h2>8. 定期收入计划</h2>
+
+<p class="section-intro">为固定的月度收入（工资、房租等）设置计划，到达指定日期后 App 自动提醒，一键确认入账。</p>
+
+<h3>新建计划</h3>
+<p>账户页底部「📅 定期收入计划」→ 点「+ 新建计划」：</p>
+
+<table>
+  <tr><th>字段</th><th>示例</th></tr>
+  <tr><td>收入名称</td><td>税后工资</td></tr>
+  <tr><td>金额</td><td>¥ 10,000</td></tr>
+  <tr><td>每月几号到账</td><td>15</td></tr>
+  <tr><td>存入账户</td><td>工行储蓄卡 → CNY</td></tr>
+  <tr><td>备注</td><td>扣除社保后</td></tr>
+</table>
+
+<h3>收入提醒</h3>
+<p>当今天的日期 ≥ 计划设定的到账日，且本月尚未确认过，App 顶部会出现绿色提醒横幅：</p>
+
+<div class="mock-page">
+  <div class="mock-banner">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">💰</span>
+      <div>
+        <div style="font-weight:600;color:var(--ok)">税后工资 本月已到账</div>
+        <div class="mock-label">¥ 10,000 · CNY → 工行储蓄卡</div>
+      </div>
+    </div>
+    <span class="mock-btn btn-ok">✅ 确认入账</span>
+  </div>
+
+  <div class="mock-card">
+    <div class="mock-row">
+      <div>
+        <span style="font-weight:600">税后工资</span>
+        <span class="mock-tag tag-ok" style="margin-left:6px">¥ 10,000</span>
+        <span class="mock-label" style="margin-left:4px">→ 工行储蓄卡</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <span class="mock-btn btn-ghost">编辑</span>
+        <span class="mock-btn btn-err" style="font-size:11px">删除</span>
+      </div>
+    </div>
+    <div class="mock-label">每月 <strong style="color:var(--gold)">15</strong> 号 · ✓ 本月已确认</div>
+  </div>
+</div>
+
+<div class="note">确认入账后，系统自动将金额加入指定账户对应货币的余额。每次点击「确认入账」只生效一次（本月）。</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 9 投资 -->
+<section id="investments">
+<h2>9. 投资持仓</h2>
+<p class="section-intro">投资模块分为「固定收益」和「非固定收益」两大类，每类均有独立的汇总统计和历史档案。</p>
+
+<div class="mock-page">
+  <div class="mock-tabs">
+    <div class="mock-tab">📊 总览</div>
+    <div class="mock-tab">🏦 账户</div>
+    <div class="mock-tab active">📈 投资</div>
+  </div>
+  <div class="mock-header">
+    <div><div class="mock-title">投资持仓</div><div class="mock-sub">固定收益及非固定收益理财产品</div></div>
+    <span class="mock-btn btn-g">+ 添加持仓</span>
+  </div>
+  <!-- 汇总表 -->
+  <div class="mock-card" style="margin-bottom:12px">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">非固定收益汇总（按币种）</div>
+    <div style="display:grid;grid-template-columns:50px 1fr 1fr 1fr;gap:6px;font-size:12px;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
+      <span class="mock-label">币种</span><span class="mock-label">合计成本</span><span class="mock-label">当前市值</span><span class="mock-label">未实现盈亏</span>
+    </div>
+    <div style="display:grid;grid-template-columns:50px 1fr 1fr 1fr;gap:6px;font-size:12px;padding:3px 0">
+      <span style="color:var(--gold);font-weight:700">HKD</span><span>HK$ 57,000</span><span>HK$ 76,000</span><span class="pos">+HK$ 19,000 +33.3%</span>
+    </div>
+    <div style="display:grid;grid-template-columns:50px 1fr 1fr 1fr;gap:6px;font-size:12px;padding:3px 0">
+      <span style="color:var(--gold);font-weight:700">USD</span><span>$ 86,164</span><span>$ 89,796</span><span class="pos">+$ 3,632 +4.2%</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 10 固定收益 -->
+<section id="fixed-inv">
+<h2>10. 固定收益持仓</h2>
+<p class="section-intro">记录债券、定期理财、货币基金等固定收益类产品，系统自动计算已计利息和到期收益。</p>
+
+<h3>添加固定收益</h3>
+<p>点「+ 添加持仓」→ 选择「📋 固定收益」，填写：</p>
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>名称</td><td>例：招行稳享180天</td></tr>
+  <tr><td>类型</td><td>债券 / 定期存款 / 固定收益理财 / 货币基金 等</td></tr>
+  <tr><td>认购金额</td><td>投入本金总额</td></tr>
+  <tr><td>年化收益率</td><td>产品标注的年化利率（%）</td></tr>
+  <tr><td>购买日 / 到期日</td><td>系统据此计算每日应计利息</td></tr>
+</table>
+
+<div class="mock-page">
+  <div class="mock-card gold">
+    <div class="mock-row">
+      <div>
+        <span class="mock-tag tag-blue">定期存款</span>
+        <span class="mock-tag tag-ok">持有中</span>
+      </div>
+      <span class="gold-val" style="font-size:18px;font-weight:700">¥ 100,000</span>
+    </div>
+    <div style="font-weight:600;margin:6px 0">招行稳享180天</div>
+    <div class="mock-grid" style="margin-top:10px">
+      <div class="mock-stat"><div class="mock-stat-label">年化利率</div><div class="mock-stat-val gold-val">3.20%</div></div>
+      <div class="mock-stat"><div class="mock-stat-label">到期总收益</div><div class="mock-stat-val pos">+¥ 1,578</div></div>
+      <div class="mock-stat"><div class="mock-stat-label">购入日</div><div class="mock-stat-val" style="font-size:13px">2026-01-01</div></div>
+      <div class="mock-stat"><div class="mock-stat-label">到期日</div><div class="mock-stat-val" style="font-size:13px">2026-07-01</div></div>
+    </div>
+    <div style="margin-top:10px">
+      <div class="mock-label">剩余时间</div>
+      <div class="pos">还有 22 天</div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:6px">
+      <span class="mock-btn btn-ghost">📝 备注</span>
+      <span class="mock-btn btn-ghost">编辑</span>
+    </div>
+  </div>
+</div>
+
+<h3>到期提醒</h3>
+<p>到期前 3 天，投资页顶部会出现红色提醒横幅。到期后卡片会显示「已到期」标签，并出现「✅ 结算」按钮。</p>
+
+<h3>结算</h3>
+<p>点「✅ 结算」后，本金+利息自动计入关联账户余额，持仓移入「🗂 历史档案」区块。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 11 非固定收益 -->
+<section id="var-inv">
+<h2>11. 非固定收益持仓</h2>
+<p class="section-intro">记录股票、ETF、公募/私募基金等，系统根据当前价格实时计算未实现盈亏和年化收益率。</p>
+
+<h3>添加持仓</h3>
+<p>点「+ 添加持仓」→ 选择「📈 非固定收益」，填写：</p>
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>名称</td><td>例：腾讯控股</td></tr>
+  <tr><td>代码</td><td>可选，例：00700.HK</td></tr>
+  <tr><td>起始买入日</td><td>用于计算持有天数与年化</td></tr>
+  <tr><td>买入价格</td><td>每股 / 每份初始价格</td></tr>
+  <tr><td>数量</td><td>初始建仓股数 / 份数</td></tr>
+  <tr><td>当前价格</td><td>可选，填入后显示盈亏</td></tr>
+</table>
+
+<div class="mock-page">
+  <div class="mock-card">
+    <div class="mock-row">
+      <div>
+        <span class="mock-tag tag-blue">股票</span>
+        <span class="mock-tag" style="background:rgba(255,255,255,.06);color:var(--muted)">00700.HK</span>
+      </div>
+      <div class="gold-val" style="font-size:18px;font-weight:700">HK$ 76,000</div>
+    </div>
+    <div style="font-weight:600;margin:4px 0">腾讯控股</div>
+    <div class="mock-label">汇丰Premier · HKD · 持有 847 天</div>
+    <!-- 盈亏 -->
+    <div style="background:rgba(82,214,138,.05);border:1px solid rgba(82,214,138,.15);border-radius:6px;padding:8px 12px;margin:10px 0">
+      <div class="mock-row">
+        <span class="mock-label">未实现盈亏</span>
+        <span class="pos" style="font-size:16px;font-weight:700">+HK$ 19,000 <span style="font-size:12px">(+33.3%)</span></span>
+      </div>
+      <div class="mock-row">
+        <span class="mock-label">年化收益率</span>
+        <span class="pos">+14.36%</span>
+      </div>
+    </div>
+    <div class="mock-grid">
+      <div><div class="mock-label">持仓成本</div><div>HK$ 57,000</div></div>
+      <div><div class="mock-label">均价 / 持仓量</div><div>285.00 / 200.00</div></div>
+      <div><div class="mock-label">现价</div><div style="border-bottom:1px dotted rgba(255,255,255,.3);display:inline">380.00</div></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+      <span class="mock-btn btn-ok">📈 仓位</span>
+      <span class="mock-btn btn-g">💰 分红</span>
+      <span class="mock-btn btn-ghost">📝 备注</span>
+      <span class="mock-btn btn-ghost">编辑</span>
+      <span class="mock-btn btn-err">🏳 清仓</span>
+    </div>
+  </div>
+</div>
+
+<h3>更新现价</h3>
+<p>直接点击卡片中「现价」数字，输入新价格，按 <span class="kbd">Enter</span> 确认。每次更新都会自动记录一个价格历史点，积累 2 次以上后可在「仓位」弹窗中查看价格走势图。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 12 仓位操作 -->
+<section id="trades">
+<h2>12. 仓位操作（补仓 / 减仓）</h2>
+<p class="section-intro">对已有持仓进行加仓或减仓操作，系统会用加权平均成本法（WACC）重新计算均价。</p>
+
+<h3>操作步骤</h3>
+<p>点击持仓卡片上「📈 仓位」→ 弹出仓位操作面板</p>
+
+<div class="mock-page">
+  <div style="font-size:13px;color:var(--muted);margin-bottom:10px">当前仓位</div>
+  <div class="mock-grid-3" style="margin-bottom:14px">
+    <div class="mock-stat"><div class="mock-stat-label">当前持仓量</div><div class="mock-stat-val gold-val">200 股</div></div>
+    <div class="mock-stat"><div class="mock-stat-label">加权均价</div><div class="mock-stat-val">HK$ 285.00</div></div>
+    <div class="mock-stat"><div class="mock-stat-label">持仓成本</div><div class="mock-stat-val">HK$ 57,000</div></div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <span class="mock-btn btn-g">📈 补仓（买入）</span>
+    <span class="mock-btn btn-ghost">📉 减仓（卖出）</span>
+  </div>
+
+  <div style="font-size:12px;color:var(--gold);margin-bottom:8px">数量、价格、总金额 — 任意填写两个，第三个自动计算</div>
+  <div class="mock-grid-3">
+    <div class="mock-stat"><div class="mock-stat-label">买入数量</div><div class="mock-stat-val">100</div></div>
+    <div class="mock-stat"><div class="mock-stat-label">买入价格</div><div class="mock-stat-val">350.00</div></div>
+    <div class="mock-stat"><div class="mock-stat-label gold-val">总金额 <span style="font-size:10px">自动</span></div><div class="mock-stat-val gold-val">35,000</div></div>
+  </div>
+
+  <div style="background:rgba(82,200,122,.07);border:1px solid rgba(82,200,122,.2);border-radius:8px;padding:10px;margin-top:10px;font-size:12px">
+    <div style="color:var(--ok);font-weight:600;margin-bottom:6px">补仓后预览</div>
+    <div class="mock-row"><span>新持仓量</span><span>300 股</span></div>
+    <div class="mock-row"><span>新均价</span><span>HK$ 306.67</span></div>
+    <div class="mock-row"><span>交易金额</span><span>HK$ 35,000</span></div>
+  </div>
+</div>
+
+<h3>三字段互算</h3>
+<p>数量、价格、总金额三个字段只需填任意两个，第三个由系统自动计算（标注「自动」）。如需手动修改自动字段，直接输入即可覆盖。</p>
+
+<h3>减仓盈亏</h3>
+<p>减仓时，系统自动计算本次已实现盈亏 = 卖出数量 × (卖出价 − 持仓均价)，并累计到「已实现盈亏」中展示。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 13 分红 -->
+<section id="dividends">
+<h2>13. 分红记录</h2>
+
+<h3>记录分红</h3>
+<p>点击持仓卡片「💰 分红」→ 填写日期、每股分红金额 / 总金额，确认后自动加入关联账户余额。</p>
+<p>卡片上会显示「累计分红」和分红笔数，分红也会计入总收益率的计算。</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- 14 清仓 -->
+<section id="clear-pos">
+<h2>14. 清仓</h2>
+
+<p class="section-intro">当持有仓位全部卖出时，点击「🏳 清仓」正式关闭该持仓，系统记录最终收益并归档。</p>
+
+<h3>清仓流程</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div>点击持仓卡片「🏳 清仓」（仅在持仓量 > 0 时显示）</div></div>
+  <div class="step"><div class="step-num">2</div><div>填写清仓日期和清仓价格（可预填当前价）</div></div>
+  <div class="step"><div class="step-num">3</div><div>确认后：系统自动添加一笔全量卖出交易，计算最终盈亏，金额入账</div></div>
+  <div class="step"><div class="step-num">4</div><div>持仓移入「🗂 已清仓档案」，不再计入活跃汇总</div></div>
+</div>
+
+<div class="mock-page">
+  <div style="font-size:13px;font-weight:600;margin-bottom:12px">🏳 确认清仓 · 腾讯控股</div>
+  <div class="mock-grid" style="margin-bottom:10px">
+    <div class="mock-stat"><div class="mock-stat-label">持仓量</div><div class="mock-stat-val">200</div></div>
+    <div class="mock-stat"><div class="mock-stat-label">加权均价</div><div class="mock-stat-val">HK$ 285.00</div></div>
+  </div>
+  <div class="mock-grid" style="margin-bottom:10px">
+    <div class="mock-stat"><div class="mock-stat-label">清仓日期</div><div class="mock-stat-val" style="font-size:13px">2026-06-09</div></div>
+    <div class="mock-stat"><div class="mock-stat-label">清仓价格</div><div class="mock-stat-val">380.00</div></div>
+  </div>
+  <div style="background:rgba(82,200,122,.07);border:1px solid rgba(82,200,122,.2);border-radius:8px;padding:10px;font-size:12px">
+    <div class="mock-row"><span>到账金额</span><span class="gold-val">HK$ 76,000</span></div>
+    <div class="mock-row"><span>本次盈亏</span><span class="pos">+HK$ 19,000</span></div>
+    <div class="mock-row"><span>总盈亏（含已实现+分红）</span><span class="pos">+HK$ 19,000 (+33.3%)</span></div>
+  </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 15 基准 -->
+<section id="benchmarks">
+<h2>15. 对比基准</h2>
+
+<p class="section-intro">将您的持仓收益率与市场指数（S&P 500、恒生指数等）进行比较，直观看出超额收益。</p>
+
+<h3>添加基准</h3>
+<p>投资页 ROI 图下方「📊 对比基准」→「+ 添加」：</p>
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>快速选择</td><td>预设：标普500、纳斯达克100、恒生指数、沪深300等</td></tr>
+  <tr><td>起始日期</td><td>您开始持仓的日期（以便同口径比较）</td></tr>
+  <tr><td>起始价格</td><td>该指数在起始日期的收盘价</td></tr>
+  <tr><td>当前价格</td><td>手动输入，或点「↻」自动从 Yahoo Finance 获取</td></tr>
+</table>
+
+<div class="mock-page">
+  <div class="mock-grid" style="gap:10px">
+    <div class="mock-card">
+      <div class="mock-row"><span style="font-weight:600">标普500</span><span style="display:flex;gap:4px"><span class="mock-btn btn-ghost" style="padding:1px 6px;font-size:11px">✎</span><span class="mock-btn btn-err" style="padding:1px 6px;font-size:11px">✕</span></span></div>
+      <div class="mock-label">^GSPC · 150 天</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div><div class="mock-label">起始价</div><div>4,700.00</div><div class="mock-label">2026-01-10</div></div>
+        <div><div class="mock-label">当前价 <span style="color:var(--gold);font-size:10px">↻</span></div><div>5,234.18</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;border-top:1px solid var(--border);padding-top:8px;margin-top:8px;font-size:12px">
+        <div><div class="mock-label">基准</div><div class="pos">+11.4%</div></div>
+        <div><div class="mock-label">USD持仓</div><div class="pos">+4.2%</div></div>
+        <div><div class="mock-label">超额</div><div class="neg">-7.2%</div></div>
+      </div>
+    </div>
+    <div class="mock-card">
+      <div class="mock-row"><span style="font-weight:600">恒生指数</span><span style="display:flex;gap:4px"><span class="mock-btn btn-ghost" style="padding:1px 6px;font-size:11px">✎</span><span class="mock-btn btn-err" style="padding:1px 6px;font-size:11px">✕</span></span></div>
+      <div class="mock-label">^HSI · 847 天</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div><div class="mock-label">起始价</div><div>19,200.00</div><div class="mock-label">2023-03-15</div></div>
+        <div><div class="mock-label">当前价 <span style="color:var(--gold);font-size:10px">↻</span></div><div>21,800.00</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;border-top:1px solid var(--border);padding-top:8px;margin-top:8px;font-size:12px">
+        <div><div class="mock-label">基准</div><div class="pos">+13.5%</div></div>
+        <div><div class="mock-label">HKD持仓</div><div class="pos">+33.3%</div></div>
+        <div><div class="mock-label">超额</div><div class="pos">+19.8%</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tip">「超额」为正（绿）= 跑赢指数；为负（红）= 跑输指数。「持仓」收益率取对应货币的全部活跃非固定收益持仓的加权平均。</div>
+<div class="note">自动获取价格依赖 Yahoo Finance 公开接口，偶有失败，建议同时手动记录作为备份。</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 16 汇率 -->
+<section id="fx">
+<h2>16. 货币兑换</h2>
+
+<p class="section-intro">记录银行换汇操作，系统自动从账户中扣减卖出货币并增加买入货币。</p>
+
+<h3>新建兑换</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div>选择兑换账户</div></div>
+  <div class="step"><div class="step-num">2</div><div>选择卖出货币 + 买入货币</div></div>
+  <div class="step"><div class="step-num">3</div><div>输入卖出金额和买入金额，系统自动显示汇率</div></div>
+  <div class="step"><div class="step-num">4</div><div>点「💱 确认兑换」，两侧余额同步更新</div></div>
+</div>
+
+<div class="mock-page">
+  <div class="mock-card">
+    <div class="mock-row"><span>卖出</span><span class="neg">-$ 5,000.00 USD</span></div>
+    <div class="mock-row"><span>买入</span><span class="pos">+¥ 36,250.00 CNY</span></div>
+    <div class="mock-row"><span class="mock-label">汇率</span><span>1 USD = 7.2500 CNY</span></div>
+    <div class="mock-row"><span class="mock-label">账户</span><span>工行储蓄卡</span></div>
+  </div>
+</div>
+
+<div class="warn">确认兑换前请检查账户余额是否充足，系统会在余额不足时阻止操作。</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 17 转账 -->
+<section id="transfer">
+<h2>17. 资金转账</h2>
+
+<p class="section-intro">在同一货币的两个账户之间划拨资金，系统同步更新双方余额。</p>
+
+<h3>操作</h3>
+<p>「🔄 转账」Tab → 填写转出账户、转入账户、货币、金额、日期 → 点「确认转账」</p>
+<div class="mock-card">
+  <div class="mock-row"><span>从</span><span>工行储蓄卡 · CNY</span></div>
+  <div class="mock-row"><span>至</span><span>招商银行卡 · CNY</span></div>
+  <div class="mock-row"><span>金额</span><span>¥ 30,000.00</span></div>
+  <div class="mock-row"><span class="mock-label">备注</span><span>归集资金</span></div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 18 隐私模式 -->
+<section id="privacy">
+<h2>18. 隐私模式</h2>
+
+<p>点击导航栏右侧的眼睛按钮，切换隐私模式：</p>
+
+<table>
+  <tr><th>图标</th><th>状态</th><th>效果</th></tr>
+  <tr><td>🙈</td><td>隐私模式（默认）</td><td>所有金额显示为 <code>***</code></td></tr>
+  <tr><td>👁</td><td>显示数据</td><td>显示真实金额</td></tr>
+</table>
+
+<div class="note">
+  <ul style="margin-left:16px">
+    <li>每次登录（或刷新页面）后默认为隐私模式，需主动点击才显示数据</li>
+    <li>隐私模式只影响数字显示，不影响任何功能操作</li>
+    <li>日期、名称、分类标签等非金额内容不受影响</li>
+  </ul>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 19 备份 -->
+<section id="backup">
+<h2>19. 数据备份与恢复</h2>
+
+<p class="section-intro">所有数据存储在浏览器 localStorage 中，换浏览器或清除缓存会导致数据丢失，请定期备份。</p>
+
+<h3>导出备份</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div>点击顶部「💾 数据」Tab</div></div>
+  <div class="step"><div class="step-num">2</div><div>点「导出数据」，下载 <code>私人账本_2026-06-09.json</code> 文件</div></div>
+  <div class="step"><div class="step-num">3</div><div>妥善保存至本地或云端</div></div>
+</div>
+
+<h3>导入恢复</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div>点「导入数据」，选择之前导出的 .json 文件</div></div>
+  <div class="step"><div class="step-num">2</div><div>确认导入，当前数据会被覆盖</div></div>
+</div>
+
+<div class="warn">导入会覆盖现有所有数据，操作前请先导出一份备份。</div>
+
+<h3>备份提醒</h3>
+<p>每月首次打开 App 时，顶部会出现「📥 本月尚未备份数据」横幅提醒。点「立即备份」等同于导出操作。</p>
+
+<h3>多账号数据隔离</h3>
+<p>不同用户名的数据互相独立存储，切换用户名登录后看到的是该用户的独立数据。</p>
+
+<div class="tip">
+  建议每月备份一次，备份文件命名加上日期方便管理。如需迁移到新电脑，导出后在新浏览器中登录并导入即可。
+</div>
+</section>
+
+<div class="divider"></div>
+
+<p style="text-align:center;color:var(--muted);font-size:12px;padding-bottom:40px">
+  WealthVault 用户手册 · 所有示例数据均为虚构，仅用于功能说明
+</p>
+
+</main>
+</div>
+
+<script>
+// 高亮当前锚点对应的侧边栏链接
+const links=[...document.querySelectorAll('.toc a')];
+const sections=[...document.querySelectorAll('section[id]')];
+const onScroll=()=>{
+  let cur='';
+  sections.forEach(s=>{if(s.getBoundingClientRect().top<=80)cur=s.id;});
+  links.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+cur);});
+};
+window.addEventListener('scroll',onScroll,{passive:true});
+onScroll();
+</script>
+</body>
+</html>

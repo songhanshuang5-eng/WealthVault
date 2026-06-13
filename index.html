@@ -132,10 +132,39 @@ select.inp{cursor:pointer;-webkit-appearance:none;background-image:url("data:ima
 .lock-sub{color:var(--muted);font-size:13px;margin-bottom:32px}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .shake{animation:shake .35s ease}
+@keyframes slideUp{from{transform:translateY(72px);opacity:0}to{transform:translateY(0);opacity:1}}
 @media(max-width:660px){
   .hnav{display:none}.bnav{display:block}
   .main{padding:16px 14px 80px}.hdr{padding:11px 16px}
-  .modal{padding:18px;max-height:92vh}
+  /* ── 底部抽屉 ── */
+  .overlay{align-items:flex-end;padding:0}
+  .modal{
+    border-radius:20px 20px 0 0;max-width:100%;max-height:92vh;
+    padding:0 18px;
+    animation:slideUp .26s cubic-bezier(.32,.72,0,1);
+  }
+  /* 拖动把手 */
+  .modal::before{
+    content:'';display:block;
+    width:40px;height:4px;background:rgba(255,255,255,.15);
+    border-radius:2px;margin:14px auto 0;flex-shrink:0;
+  }
+  /* 标题吸顶 */
+  .modal-title{
+    position:sticky;top:0;z-index:1;
+    background:var(--bg2);
+    padding:14px 0 12px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:14px;
+  }
+  /* 操作栏吸底 */
+  .modal-footer{
+    position:sticky;bottom:0;
+    background:var(--bg2);
+    margin:8px -18px 0;
+    padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+  }
   .g2{grid-template-columns:1fr}.fx-grid{grid-template-columns:1fr}
   .modal-row{grid-template-columns:1fr}
   .rates-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
@@ -155,15 +184,21 @@ select.inp{cursor:pointer;-webkit-appearance:none;background-image:url("data:ima
 window.onerror=function(msg,src,line,col,err){var boot=document.getElementById('app-boot');if(boot){boot.style.display='flex';document.getElementById('load-msg').innerHTML='<span style="color:#F08080">❌ 错误（第'+line+'行）:<br>'+msg+'</span><br><br><span style="color:#6E7A90;font-size:11px">请按 F12 查看详情</span>';}return true;};
 window.addEventListener('unhandledrejection',function(e){var msg=e.reason&&(e.reason.message||String(e.reason))||'未知错误';var el=document.getElementById('load-msg');if(el)el.innerHTML='<span style="color:#F08080">❌ 运行错误: '+msg+'</span>';});
 </script>
-<script src="js/utils.js?v=2"></script>
-<script src="js/components.js?v=2"></script>
-<script src="js/auth.js?v=3"></script>
-<script src="js/page-overview.js?v=2"></script>
-<script src="js/page-accounts.js?v=2"></script>
-<script src="js/page-investments.js?v=2"></script>
-<script src="js/page-fx.js?v=2"></script>
-<script src="js/page-transfer.js?v=2"></script>
-<script src="js/page-data.js?v=3"></script>
-<script src="js/app.js?v=4"></script>
+<script src="js/utils.js?v=16"></script>
+<script src="js/components-charts.js?v=16"></script>
+<script src="js/components-settings.js?v=16"></script>
+<script src="js/components-tx.js?v=16"></script>
+<script src="js/components-account.js?v=16"></script>
+<script src="js/components-liability.js?v=16"></script>
+<script src="js/components-investment.js?v=16"></script>
+<script src="js/auth.js?v=16"></script>
+<script src="js/page-overview.js?v=16"></script>
+<script src="js/page-accounts.js?v=16"></script>
+<script src="js/page-investments.js?v=16"></script>
+<script src="js/page-fx.js?v=16"></script>
+<script src="js/page-transfer.js?v=16"></script>
+<script src="js/page-data.js?v=16"></script>
+<script src="js/page-analysis.js?v=16"></script>
+<script src="js/app.js?v=16"></script>
 </body>
 </html>

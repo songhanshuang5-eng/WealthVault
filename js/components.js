@@ -1,4 +1,309 @@
 // ══════════════════════════════════════════════════════════
+// 存款到期结算 Modal
+// ══════════════════════════════════════════════════════════
+function HoldingSettleModal({acc, holding, onSettle, onClose}){
+  const di=calcDepositInterest(holding);
+  const principal=Number(holding.amount);
+  const interest=di?(di.type==='fixed'?di.totalInterest:di.interest):0;
+  const total=Math.round((principal+interest)*1e8)/1e8;
+  const sym=CUR_SYM[holding.currency]||'';
+  const today=new Date().toISOString().slice(0,10);
+
+  const [reinvest,setReinvest]=useState('');
+  const [newRate,setNewRate]=useState(String(holding.interestRate||''));
+  const [newStart,setNewStart]=useState(holding.maturityDate||today);
+  const [newEnd,setNewEnd]=useState('');
+  const [note,setNote]=useState('');
+
+  const reinvestN=Math.max(0,parseFloat(reinvest)||0);
+  const cashOut=Math.round((total-reinvestN)*1e8)/1e8;
+  const canSave=cashOut>=0&&reinvestN<=total;
+
+  const submit=()=>{
+    if(!canSave)return;
+    onSettle({interest,reinvestAmount:reinvestN,cashAmount:cashOut,
+      newRate:parseFloat(newRate)||0,newStart,newEnd,
+      currency:holding.currency,note:note.trim()});
+  };
+
+  // 新存款预览
+  const newDi=(reinvestN>0&&newRate&&newStart&&newEnd)
+    ?calcDepositInterest({depositType:'fixed',amount:reinvestN,interestRate:parseFloat(newRate),startDate:newStart,maturityDate:newEnd})
+    :null;
+
+  return html`
+    <div className="overlay" onClick=${e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal" style=${{maxWidth:480}}>
+        <div className="modal-title">🏦 到期结算 · ${holding.currency}</div>
+
+        <!-- 结算摘要 -->
+        <div style=${{background:'var(--bg3)',borderRadius:10,padding:'14px 16px',marginBottom:16}}>
+          <div style=${{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px 20px'}}>
+            <div><div className="txs tm mb1">存款本金</div>
+              <div className="fn ts">${sym}${fmtNum(principal)}</div></div>
+            <div><div className="txs tm mb1">到期利息</div>
+              <div className="fn pl-pos">+${sym}${fmtNum(interest)}</div></div>
+            <div style=${{gridColumn:'1/-1',borderTop:'1px solid var(--border)',paddingTop:8,marginTop:4}}>
+              <div className="txs tm mb1">可取总额</div>
+              <div className="fh fn tg" style=${{fontSize:20}}>${sym}${fmtNum(total)}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 续存设置 -->
+        <div className="txs fw6 tm mb8">续存部分（可留空表示全额取出）</div>
+        <div className="modal-row">
+          <div className="inp-group"><div className="inp-label">续存金额</div>
+            <input className="inp" type="number" step="any" min="0" autoFocus
+              placeholder=${'最多 '+sym+fmtNum(total)}
+              value=${reinvest} onChange=${e=>setReinvest(e.target.value)}/>
+            ${reinvestN>total?html`<div style=${{color:'var(--err)',fontSize:12,marginTop:3}}>超出可取总额</div>`:null}
+          </div>
+          <div className="inp-group"><div className="inp-label">取出金额（自动）</div>
+            <div className="fn ts" style=${{padding:'10px 12px',background:'var(--bg3)',borderRadius:8,marginTop:4,
+              color:cashOut>=0?'var(--ok)':'var(--err)'}}>
+              ${sym}${fmtNum(cashOut)}
+              ${interest>0&&cashOut>0?html`<div className="txs tm mt1">含利息 ${sym}${fmtNum(Math.min(interest,cashOut))}</div>`:null}
+            </div>
+          </div>
+        </div>
+
+        ${reinvestN>0&&html`
+          <div className="txs fw6 tm mb8 mt4">新存款条款</div>
+          <div className="modal-row">
+            <div className="inp-group"><div className="inp-label">新年利率（%）</div>
+              <input className="inp" type="number" step="any" min="0" value=${newRate} onChange=${e=>setNewRate(e.target.value)}/>
+            </div>
+            <div className="inp-group"><div className="inp-label">起息日</div>
+              <input className="inp" type="date" value=${newStart} onChange=${e=>setNewStart(e.target.value)}/>
+            </div>
+          </div>
+          <div className="inp-group"><div className="inp-label">新到期日</div>
+            <input className="inp" type="date" value=${newEnd} onChange=${e=>setNewEnd(e.target.value)}/>
+          </div>
+          ${newDi&&html`
+            <div style=${{background:'rgba(82,200,122,.06)',border:'1px solid rgba(82,200,122,.15)',borderRadius:8,padding:'10px 14px',marginBottom:12}}>
+              <div className="fb mb4"><span className="txs tm">新存期</span><span className="fn ts">${newDi.termDays} 天</span></div>
+              <div className="fb mb4"><span className="txs tm">到期利息</span><span className="fn pl-pos">+${sym}${fmtNum(newDi.totalInterest)}</span></div>
+              <div className="fb"><span className="txs tm">到期总额</span><span className="fn tg" style=${{fontSize:16}}>${sym}${fmtNum(reinvestN+newDi.totalInterest)}</span></div>
+            </div>
+          `}
+        `}
+
+        <div className="inp-group"><div className="inp-label">备注（可选）</div>
+          <input className="inp" placeholder="例：部分取出用于消费" value=${note} onChange=${e=>setNote(e.target.value)}/>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn btn-ghost" onClick=${onClose}>取消</button>
+          <button className="btn btn-gold" onClick=${submit} disabled=${!canSave}>
+            ✅ 确认结算
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
+// 定期收入计划 Modal
+// ══════════════════════════════════════════════════════════
+function IncomePlanModal({accounts,plan,onSave,onClose}){
+  const [f,sf]=useState({
+    name:plan?.name||'',
+    amount:plan?.amount||'',
+    currency:plan?.currency||(accounts[0]?.holdings?.[0]?.currency||'CNY'),
+    accountId:plan?.accountId||(accounts[0]?.id||''),
+    dayOfMonth:plan?.dayOfMonth||1,
+    note:plan?.note||'',
+  });
+  const set=k=>e=>sf(x=>({...x,[k]:e.target.value}));
+  const selectedAcc=accounts.find(a=>String(a.id)===String(f.accountId));
+  const onAccChange=e=>{
+    const acc=accounts.find(a=>String(a.id)===String(e.target.value));
+    const cur=acc?.holdings?.[0]?.currency||'CNY';
+    sf(x=>({...x,accountId:e.target.value,currency:cur}));
+  };
+  const canSave=f.name.trim()&&Number(f.amount)>0&&f.dayOfMonth>=1&&f.dayOfMonth<=31;
+  const submit=()=>{
+    if(!canSave)return;
+    onSave({...plan,...f,amount:Number(f.amount),dayOfMonth:Number(f.dayOfMonth)});
+  };
+  const sym=CUR_SYM[f.currency]||'';
+  return html`
+    <div className="overlay" onClick=${e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal" style=${{maxWidth:400}}>
+        <div className="modal-title">${plan?'编辑收入计划':'新建定期收入计划'}</div>
+
+        <div className="inp-group"><div className="inp-label">收入名称 *</div>
+          <input className="inp" placeholder="例：工资、房租收入" autoFocus
+            value=${f.name} onChange=${set('name')}/>
+        </div>
+
+        <div className="modal-row">
+          <div className="inp-group"><div className="inp-label">金额 *</div>
+            <input className="inp" type="number" step="any" min="0"
+              placeholder="每次入账金额" value=${f.amount} onChange=${set('amount')}/>
+          </div>
+          <div className="inp-group"><div className="inp-label">每月几号到账</div>
+            <input className="inp" type="number" min="1" max="31"
+              value=${f.dayOfMonth} onChange=${set('dayOfMonth')}/>
+          </div>
+        </div>
+
+        <div className="modal-row">
+          <div className="inp-group"><div className="inp-label">存入账户</div>
+            <select className="inp" value=${f.accountId} onChange=${onAccChange}>
+              <option value="">不关联账户</option>
+              ${accounts.map(a=>html`<option key=${a.id} value=${a.id}>${a.name}</option>`)}
+            </select>
+          </div>
+          <div className="inp-group"><div className="inp-label">货币</div>
+            <select className="inp" value=${f.currency} onChange=${set('currency')}>
+              ${(selectedAcc?.holdings||[]).length>0
+                ?(selectedAcc.holdings||[]).map(h=>html`<option key=${h.currency} value=${h.currency}>${h.currency}</option>`)
+                :CURRENCIES.map(c=>html`<option key=${c} value=${c}>${c}</option>`)}
+            </select>
+          </div>
+        </div>
+
+        <div className="inp-group"><div className="inp-label">备注（可选）</div>
+          <input className="inp" placeholder="例：税后工资" value=${f.note} onChange=${set('note')}
+            onKeyDown=${e=>e.key==='Enter'&&submit()}/>
+        </div>
+
+        ${f.name&&Number(f.amount)>0?html`
+          <div style=${{background:'var(--bg3)',borderRadius:8,padding:'10px 14px',marginBottom:12,fontSize:13}}>
+            <div className="fc g6 txs tm">
+              <span>📅</span>
+              <span>每月 <b style=${{color:'var(--gold)'}}>${f.dayOfMonth}</b> 号提醒入账</span>
+              <span style=${{color:'var(--ok)',fontWeight:600}}>${sym}${fmtNum(Number(f.amount))}</span>
+              ${f.accountId?html`<span>→ ${selectedAcc?.name||''}</span>`:''}
+            </div>
+          </div>
+        `:null}
+
+        <div className="modal-footer">
+          <button className="btn btn-ghost" onClick=${onClose}>取消</button>
+          <button className="btn btn-gold" onClick=${submit} disabled=${!canSave}>保存</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
+// 支出 Modal
+// ══════════════════════════════════════════════════════════
+function ExpenseModal({accounts,defaultAccountId,onSave,onClose}){
+  const today=new Date().toISOString().slice(0,10);
+  // 初始货币跟随 defaultAccountId 账户的第一种货币，避免硬编码 CNY
+  const _defAcc=accounts.find(a=>String(a.id)===String(defaultAccountId));
+  const _defCur=_defAcc?.holdings?.find(h=>Number(h.amount)>0)?.currency
+    ||_defAcc?.holdings?.[0]?.currency||'CNY';
+  const [f,sf]=useState({
+    date:today,
+    amount:'',
+    currency:_defCur,
+    accountId:defaultAccountId||'',
+    category:EXPENSE_CATEGORIES[0],
+    note:'',
+  });
+  const set=k=>e=>sf(x=>({...x,[k]:e.target.value}));
+
+  // 汇总该账户该币种的所有 holdings（避免 .find 只取第一条）
+  const selectedAcc=accounts.find(a=>String(a.id)===String(f.accountId));
+  const avail=selectedAcc
+    ?(selectedAcc.holdings||[])
+      .filter(h=>h.currency===f.currency)
+      .reduce((s,h)=>s+Number(h.amount||0),0)
+    :null;
+  const insufficient=avail!==null&&Number(f.amount)>Number(avail);
+  const canSave=f.amount&&Number(f.amount)>0&&f.date&&f.currency&&!insufficient;
+
+  // 切换账户时，自动切到该账户第一种货币
+  const onAccChange=e=>{
+    const acc=accounts.find(a=>String(a.id)===String(e.target.value));
+    const firstCur=acc?.holdings?.[0]?.currency||'CNY';
+    sf(x=>({...x,accountId:e.target.value,currency:firstCur}));
+  };
+
+  const submit=()=>{
+    if(!canSave)return;
+    onSave({date:f.date,amount:Number(f.amount),currency:f.currency,
+      accountId:f.accountId||null,category:f.category,note:f.note.trim()});
+  };
+
+  const sym=CUR_SYM[f.currency]||'';
+  return html`
+    <div className="overlay" onClick=${e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal" style=${{maxWidth:420}}>
+        <div className="modal-title">💸 记录支出</div>
+
+        <div className="modal-row">
+          <div className="inp-group"><div className="inp-label">日期 *</div>
+            <input className="inp" type="date" value=${f.date} onChange=${set('date')}/>
+          </div>
+          <div className="inp-group">
+            <div className="inp-label">金额 *</div>
+            <input className="inp" type="number" step="any" min="0" autoFocus
+              placeholder="支出金额" value=${f.amount}
+              style=${{borderColor:insufficient?'var(--err)':undefined}}
+              onChange=${set('amount')}/>
+            ${insufficient?html`<div style=${{color:'var(--err)',fontSize:12,marginTop:3}}>余额不足，可用 ${sym}${fmtNum(avail)}</div>`:null}
+            ${avail!==null&&!insufficient?html`<div className="txs tm mt1">可用 ${sym}${fmtNum(avail)}</div>`:null}
+          </div>
+        </div>
+
+        <div className="modal-row">
+          <div className="inp-group"><div className="inp-label">扣款账户</div>
+            <select className="inp" value=${f.accountId} onChange=${onAccChange}>
+              <option value="">不关联账户</option>
+              ${accounts.map(a=>html`<option key=${a.id} value=${a.id}>${a.name}</option>`)}
+            </select>
+          </div>
+          <div className="inp-group"><div className="inp-label">货币</div>
+            <select className="inp" value=${f.currency} onChange=${set('currency')}>
+              ${(selectedAcc?.holdings||[]).length>0
+                ?(selectedAcc.holdings||[]).map(h=>html`<option key=${h.currency} value=${h.currency}>${h.currency}</option>`)
+                :CURRENCIES.map(c=>html`<option key=${c} value=${c}>${c}</option>`)}
+            </select>
+          </div>
+        </div>
+
+        <div className="inp-group"><div className="inp-label">分类</div>
+          <div style=${{display:'flex',flexWrap:'wrap',gap:6,marginTop:4}}>
+            ${EXPENSE_CATEGORIES.map(cat=>html`
+              <button key=${cat} onClick=${()=>sf(x=>({...x,category:cat}))}
+                style=${{padding:'4px 12px',borderRadius:20,fontSize:12,cursor:'pointer',border:'1px solid',
+                  background:f.category===cat?(EXPENSE_CAT_COLORS[cat]+'33'):'transparent',
+                  borderColor:f.category===cat?EXPENSE_CAT_COLORS[cat]:'rgba(255,255,255,.12)',
+                  color:f.category===cat?EXPENSE_CAT_COLORS[cat]:'var(--muted)',
+                  transition:'all .15s'}}>
+                ${cat}
+              </button>
+            `)}
+          </div>
+        </div>
+
+        <div className="inp-group" style=${{marginTop:12}}><div className="inp-label">备注（可选）</div>
+          <input className="inp" placeholder="例：午餐、地铁月票" value=${f.note} onChange=${set('note')}
+            onKeyDown=${e=>e.key==='Enter'&&submit()}/>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn btn-ghost" onClick=${onClose}>取消</button>
+          <button className="btn" style=${{background:'rgba(240,128,128,.15)',color:'var(--err)',border:'1px solid rgba(240,128,128,.3)'}}
+            onClick=${submit} disabled=${!canSave}>
+            💸 确认支出
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
 // 新增图表组件
 // ══════════════════════════════════════════════════════════
 
@@ -900,16 +1205,58 @@ function TradeModal({inv,onAddTrade,onDeleteTrade,onClose}){
   const [date,setDate]=useState(today);
   const [qty,setQty]=useState('');
   const [price,setPrice]=useState('');
+  const [total,setTotal]=useState('');
+  const [autoField,setAutoField]=useState(null); // 'qty'|'price'|'total'
   const [note,setNote]=useState('');
   const [err,setErr]=useState('');
 
-  // 当前有效仓位（含已有 trades）
   const pos=calcEffectivePosition(inv);
   const sym=CUR_SYM[inv.currency]||'';
+  const r8=v=>String(Math.round(v*1e8)/1e8);
 
-  // 操作预览
-  const qtyN=Number(qty)||0;
-  const priceN=Number(price)||0;
+  // 当某字段变为无效时，清掉由它衍生出来的 auto 字段
+  const clearAuto=()=>{
+    if(autoField==='qty')setQty('');
+    else if(autoField==='price')setPrice('');
+    else if(autoField==='total')setTotal('');
+    setAutoField(null);
+  };
+
+  const onQtyChange=val=>{
+    setQty(val);setErr('');
+    const q=parseFloat(val);
+    if(isNaN(q)||q<=0){clearAuto();return;}
+    // 跳过被自动算出的字段，只用手动输入的字段作为源
+    const p=autoField==='price'?NaN:parseFloat(price);
+    const t=autoField==='total'?NaN:parseFloat(total);
+    if(!isNaN(p)&&p>0){setTotal(r8(q*p));setAutoField('total');}
+    else if(!isNaN(t)&&t>0){setPrice(r8(t/q));setAutoField('price');}
+    else setAutoField(null);
+  };
+  const onPriceChange=val=>{
+    setPrice(val);setErr('');
+    const p=parseFloat(val);
+    if(isNaN(p)||p<=0){clearAuto();return;}
+    const q=autoField==='qty'?NaN:parseFloat(qty);
+    const t=autoField==='total'?NaN:parseFloat(total);
+    if(!isNaN(q)&&q>0){setTotal(r8(q*p));setAutoField('total');}
+    else if(!isNaN(t)&&t>0){setQty(r8(t/p));setAutoField('qty');}
+    else setAutoField(null);
+  };
+  const onTotalChange=val=>{
+    setTotal(val);setErr('');
+    const t=parseFloat(val);
+    if(isNaN(t)||t<=0){clearAuto();return;}
+    const p=autoField==='price'?NaN:parseFloat(price);
+    const q=autoField==='qty'?NaN:parseFloat(qty);
+    if(!isNaN(p)&&p>0){setQty(r8(t/p));setAutoField('qty');}
+    else if(!isNaN(q)&&q>0){setPrice(r8(t/q));setAutoField('price');}
+    else setAutoField(null);
+  };
+  const resetFields=()=>{setQty('');setPrice('');setTotal('');setAutoField(null);setErr('');};
+
+  const qtyN=parseFloat(qty)||0;
+  const priceN=parseFloat(price)||0;
   const preview=useMemo(()=>{
     if(!qtyN||!priceN)return null;
     if(type==='buy'){
@@ -931,7 +1278,7 @@ function TradeModal({inv,onAddTrade,onDeleteTrade,onClose}){
     if(!canSave)return;
     if(type==='sell'&&qtyN>pos.effectiveQty){setErr('减仓数量超过当前持仓');return;}
     onAddTrade({type,date,quantity:qtyN,price:priceN,note:note.trim()});
-    setQty('');setPrice('');setNote('');setErr('');
+    resetFields();setNote('');
   };
 
   // 交易历史（按日期降序）
@@ -960,23 +1307,53 @@ function TradeModal({inv,onAddTrade,onDeleteTrade,onClose}){
           <button className=${'btn btn-sm '+(type==='buy'?'btn-gold':'btn-ghost')} onClick=${()=>{setType('buy');setErr('');}}>📈 补仓（买入）</button>
           <button className=${'btn btn-sm '+(type==='sell'?'btn-gold':'btn-ghost')} onClick=${()=>{setType('sell');setErr('');}}>📉 减仓（卖出）</button>
         </div>
-        <div className="modal-row">
-          <div className="inp-group"><div className="inp-label">交易日期 *</div>
-            <input className="inp" type="date" value=${date} onChange=${e=>setDate(e.target.value)}/>
+        <div className="inp-group mb10">
+          <div className="inp-label">交易日期 *</div>
+          <input className="inp" type="date" value=${date} onChange=${e=>setDate(e.target.value)} style=${{maxWidth:180}}/>
+        </div>
+
+        <!-- 三字段互算 -->
+        <div className="txs tm mb8" style=${{color:'var(--gold)'}}>
+          数量、价格、总金额 — 任意填写两个，第三个自动计算
+        </div>
+        <div style=${{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:12}}>
+          <div className="inp-group" style=${{margin:0}}>
+            <div className="inp-label fc g4">
+              ${type==='buy'?'买入':'卖出'}数量
+              ${type==='sell'?html`<span className="txs tm">/ ${fmtNum(pos.effectiveQty,4)}</span>`:''}
+              ${autoField==='qty'?html`<span style=${{marginLeft:'auto',color:'var(--gold)',fontSize:10,opacity:.8}}>自动</span>`:''}
+            </div>
+            <input className="inp" type="number" step="any" min="0" placeholder="股数/份数"
+              value=${qty}
+              style=${{background:autoField==='qty'?'rgba(201,160,67,.06)':undefined}}
+              onChange=${e=>onQtyChange(e.target.value)}/>
           </div>
-          <div className="inp-group">
-            <div className="inp-label">${type==='buy'?'买入':'卖出'}数量 *${type==='sell'?html` <span className="txs tm">（持仓 ${fmtNum(pos.effectiveQty,4)} 股）</span>`:''}</div>
-            <input className="inp" type="number" step="any" min="0" placeholder="股数 / 份数" value=${qty} onChange=${e=>{setQty(e.target.value);setErr('');}}/>
+          <div className="inp-group" style=${{margin:0}}>
+            <div className="inp-label fc g4">
+              ${type==='buy'?'买入':'卖出'}价格
+              ${autoField==='price'?html`<span style=${{marginLeft:'auto',color:'var(--gold)',fontSize:10,opacity:.8}}>自动</span>`:''}
+            </div>
+            <input className="inp" type="number" step="any" min="0" placeholder=${'每股/份 '+sym}
+              value=${price}
+              style=${{background:autoField==='price'?'rgba(201,160,67,.06)':undefined}}
+              onChange=${e=>onPriceChange(e.target.value)}/>
+          </div>
+          <div className="inp-group" style=${{margin:0}}>
+            <div className="inp-label fc g4">
+              总金额
+              ${autoField==='total'?html`<span style=${{marginLeft:'auto',color:'var(--gold)',fontSize:10,opacity:.8}}>自动</span>`:''}
+            </div>
+            <input className="inp" type="number" step="any" min="0" placeholder=${'合计 '+sym}
+              value=${total}
+              style=${{background:autoField==='total'?'rgba(201,160,67,.06)':undefined}}
+              onChange=${e=>onTotalChange(e.target.value)}/>
           </div>
         </div>
-        <div className="modal-row">
-          <div className="inp-group">
-            <div className="inp-label">${type==='buy'?'买入':'卖出'}价格 *</div>
-            <input className="inp" type="number" step="any" min="0" placeholder=${'每股/份价格 '+sym} value=${price} onChange=${e=>{setPrice(e.target.value);setErr('');}}/>
-          </div>
-          <div className="inp-group"><div className="inp-label">备注（可选）</div>
-            <input className="inp" placeholder=${type==='buy'?'例：加仓看好Q3业绩':'例：止盈部分仓位'} value=${note} onChange=${e=>setNote(e.target.value)}/>
-          </div>
+
+        <div className="inp-group">
+          <div className="inp-label">备注（可选）</div>
+          <input className="inp" placeholder=${type==='buy'?'例：加仓看好Q3业绩':'例：止盈部分仓位'}
+            value=${note} onChange=${e=>setNote(e.target.value)}/>
         </div>
 
         <!-- 操作预览 -->
@@ -1150,6 +1527,135 @@ function DividendModal({inv,onAddDividend,onDeleteDividend,onClose}){
         </div>
 
         <div className="modal-footer" style=${{marginTop:14}}>
+          <button className="btn btn-ghost" onClick=${onClose}>关闭</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════
+// 账户流水 Modal
+// ══════════════════════════════════════════════════════════
+function StatementModal({acc,fxHistory,transfers,onClose}){
+  const today=new Date().toISOString().slice(0,10);
+  const firstOfMonth=today.slice(0,7)+'-01';
+  const [from,setFrom]=useState(firstOfMonth);
+  const [to,setTo]=useState(today);
+
+  const txns=useMemo(()=>{
+    const list=[];
+    (acc.holdings||[]).forEach(h=>{
+      const d=h.entryDate||'';
+      if(!d||d<from||d>to)return;
+      list.push({date:d,currency:h.currency,type:'转入',amount:Number(h.amount),note:h.summary||h.note||'',sign:1});
+    });
+    (fxHistory||[]).filter(fx=>String(fx.accountId)===String(acc.id)).forEach(fx=>{
+      const d=fx.date||'';
+      if(!d||d<from||d>to)return;
+      const isNew=fx.sellCurrency!=null;
+      const sellCur=isNew?fx.sellCurrency:fx.from;
+      const buyCur=isNew?fx.buyCurrency:fx.to;
+      const sellAmt=isNew?fx.sellAmount:fx.amount;
+      const buyAmt=isNew?fx.buyAmount:fx.result;
+      list.push({date:d,currency:sellCur,type:'换汇卖出',amount:Number(sellAmt),note:fx.note||'',sign:-1});
+      list.push({date:d,currency:buyCur,type:'换汇买入',amount:Number(buyAmt),note:fx.note||'',sign:1});
+    });
+    (transfers||[]).forEach(tx=>{
+      const d=tx.date||'';
+      if(!d||d<from||d>to)return;
+      if(String(tx.fromAccountId)===String(acc.id))
+        list.push({date:d,currency:tx.currency,type:'转出',amount:Number(tx.amount),note:tx.note||'',sign:-1});
+      else if(String(tx.toAccountId)===String(acc.id))
+        list.push({date:d,currency:tx.currency,type:'转入',amount:Number(tx.amount),note:tx.note||'',sign:1});
+    });
+    (acc.liabilities||[]).forEach(l=>{
+      (l.payments||[]).forEach(p=>{
+        const d=p.date||'';
+        if(!d||d<from||d>to)return;
+        if(String(p.fromAccountId)!==String(acc.id))return;
+        list.push({date:d,currency:p.currency||l.currency,type:'还款',amount:Number(p.totalPaid),note:p.note||l.name||'',sign:-1});
+      });
+    });
+    return list.sort((a,b)=>b.date.localeCompare(a.date)||(b.sign-a.sign));
+  },[acc,fxHistory,transfers,from,to]);
+
+  const inTotal={};const outTotal={};
+  txns.forEach(t=>{
+    if(t.sign>0)inTotal[t.currency]=(inTotal[t.currency]||0)+t.amount;
+    else outTotal[t.currency]=(outTotal[t.currency]||0)+t.amount;
+  });
+
+  return html`
+    <div className="overlay" onClick=${e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal" style=${{maxWidth:620}}>
+        <div className="modal-title">📋 ${acc.bank} · ${acc.name} 流水明细</div>
+        <div className="modal-row" style=${{marginBottom:16}}>
+          <div className="inp-group">
+            <div className="inp-label">开始日期</div>
+            <input className="inp" type="date" value=${from} onChange=${e=>setFrom(e.target.value)}/>
+          </div>
+          <div className="inp-group">
+            <div className="inp-label">结束日期</div>
+            <input className="inp" type="date" value=${to} onChange=${e=>setTo(e.target.value)}/>
+          </div>
+        </div>
+        ${txns.length>0&&html`
+          <div style=${{background:'var(--bg3)',borderRadius:8,padding:'10px 14px',marginBottom:12,display:'flex',gap:24,flexWrap:'wrap'}}>
+            <div>
+              <div className="txs tm mb2">合计转入</div>
+              ${Object.keys(inTotal).length===0
+                ?html`<div className="txs tm">—</div>`
+                :Object.entries(inTotal).map(([cur,amt])=>html`<div key=${cur} className="fn" style=${{color:'var(--ok)',fontSize:13}}>${CUR_SYM[cur]||''}${fmtNum(amt)} <span className="txs tm">${cur}</span></div>`)
+              }
+            </div>
+            <div>
+              <div className="txs tm mb2">合计转出</div>
+              ${Object.keys(outTotal).length===0
+                ?html`<div className="txs tm">—</div>`
+                :Object.entries(outTotal).map(([cur,amt])=>html`<div key=${cur} className="fn" style=${{color:'var(--err)',fontSize:13}}>${CUR_SYM[cur]||''}${fmtNum(amt)} <span className="txs tm">${cur}</span></div>`)
+              }
+            </div>
+            <div><div className="txs tm mb2">共</div><div className="fn ts">${txns.length} 笔</div></div>
+          </div>
+        `}
+        ${txns.length===0
+          ?html`<div className="ts tm" style=${{textAlign:'center',padding:'28px 0'}}>该时间段内暂无流水记录</div>`
+          :html`<div style=${{maxHeight:420,overflowY:'auto',borderRadius:8,border:'1px solid var(--border)'}}>
+            <table style=${{width:'100%',borderCollapse:'collapse',fontSize:13}}>
+              <thead>
+                <tr style=${{borderBottom:'1px solid var(--border2)',background:'var(--bg3)'}}>
+                  <th style=${{padding:'8px 10px',textAlign:'left',color:'var(--muted)',fontWeight:500,whiteSpace:'nowrap'}}>日期</th>
+                  <th style=${{padding:'8px 10px',textAlign:'left',color:'var(--muted)',fontWeight:500}}>类型</th>
+                  <th style=${{padding:'8px 10px',textAlign:'right',color:'var(--muted)',fontWeight:500}}>金额</th>
+                  <th style=${{padding:'8px 10px',textAlign:'left',color:'var(--muted)',fontWeight:500}}>币种</th>
+                  <th style=${{padding:'8px 10px',textAlign:'left',color:'var(--muted)',fontWeight:500}}>摘要</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${txns.map((t,i)=>html`
+                  <tr key=${i} style=${{borderBottom:'1px solid rgba(36,45,63,.5)',background:i%2===0?'transparent':'rgba(30,38,55,.3)'}}>
+                    <td style=${{padding:'8px 10px',color:'var(--muted)',fontSize:12,whiteSpace:'nowrap'}}>${t.date}</td>
+                    <td style=${{padding:'8px 10px'}}>
+                      <span style=${{
+                        background:t.sign>0?'rgba(82,214,138,.1)':t.type==='换汇卖出'?'rgba(201,160,67,.1)':'rgba(240,128,128,.1)',
+                        color:t.sign>0?'var(--ok)':t.type==='换汇卖出'?'var(--gold)':'var(--err)',
+                        padding:'2px 7px',borderRadius:4,fontSize:11,fontWeight:600,whiteSpace:'nowrap'
+                      }}>${t.type}</span>
+                    </td>
+                    <td style=${{padding:'8px 10px',textAlign:'right',fontFamily:'var(--fh)',fontSize:15,
+                      color:t.sign>0?'var(--ok)':t.type==='换汇卖出'?'var(--gold)':'var(--err)',fontWeight:600,whiteSpace:'nowrap'}}>
+                      ${t.sign>0?'+':'-'}${fmtNum(t.amount)}
+                    </td>
+                    <td style=${{padding:'8px 10px',color:'var(--gold)',fontSize:12,fontWeight:600}}>${t.currency}</td>
+                    <td style=${{padding:'8px 10px',color:'var(--muted)',fontSize:12,maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>${t.note||'—'}</td>
+                  </tr>
+                `)}
+              </tbody>
+            </table>
+          </div>`
+        }
+        <div className="modal-footer" style=${{marginTop:16}}>
           <button className="btn btn-ghost" onClick=${onClose}>关闭</button>
         </div>
       </div>
