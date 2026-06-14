@@ -13,6 +13,11 @@ __pycache__/
 .DS_Store
 .AppleDouble
 
+# Claude 生成的临时文件
+*.svg
+image.png
+.claude/
+
 # 编辑器
 .vscode/
 .idea/
