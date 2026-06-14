@@ -107,7 +107,7 @@ tr:last-child td{border-bottom:none}
 
 <!-- 侧边栏 -->
 <nav class="sidebar">
-  <div class="sidebar-title">WealthVault<span>用户手册 v1.0</span></div>
+  <div class="sidebar-title">WealthVault<span>用户手册 v1.1</span></div>
   <div class="toc">
     <div class="toc-section">入门</div>
     <a href="#install">1. 安装与启动</a>
@@ -116,111 +116,101 @@ tr:last-child td{border-bottom:none}
     <a href="#overview-tab">4. 总览</a>
 
     <div class="toc-section">账户</div>
-    <a href="#accounts">4. 银行账户</a>
-    <a href="#holdings">5. 存款管理</a>
-    <a href="#liabilities">6. 负债管理</a>
-    <a href="#expenses">7. 支出记录</a>
-    <a href="#income-plans">8. 定期收入计划</a>
+    <a href="#accounts">5. 银行账户</a>
+    <a href="#holdings">6. 存款管理</a>
+    <a href="#liabilities">7. 负债管理</a>
+    <a href="#expenses">8. 支出记录</a>
+    <a href="#income-plans">9. 定期收入计划</a>
 
     <div class="toc-section">投资</div>
-    <a href="#investments">9. 投资持仓</a>
-    <a href="#fixed-inv">10. 固定收益</a>
-    <a href="#var-inv">11. 非固定收益</a>
-    <a href="#trades">12. 仓位操作</a>
-    <a href="#dividends">13. 分红记录</a>
-    <a href="#clear-pos">14. 清仓</a>
-    <a href="#benchmarks">15. 对比基准</a>
+    <a href="#investments">10. 投资持仓</a>
+    <a href="#fixed-inv">11. 固定收益</a>
+    <a href="#var-inv">12. 非固定收益</a>
+    <a href="#trades">13. 仓位操作</a>
+    <a href="#dividends">14. 分红记录</a>
+    <a href="#clear-pos">15. 清仓</a>
+    <a href="#benchmarks">16. 对比基准</a>
 
     <div class="toc-section">工具</div>
-    <a href="#fx">16. 货币兑换</a>
-    <a href="#transfer">17. 资金转账</a>
-    <a href="#privacy">18. 隐私模式</a>
-    <a href="#backup">19. 数据备份</a>
+    <a href="#fx">17. 货币兑换</a>
+    <a href="#transfer">18. 资金转账</a>
+    <a href="#privacy">19. 隐私模式</a>
+    <a href="#sync">20. 多设备同步</a>
+    <a href="#backup">21. 数据备份</a>
   </div>
 </nav>
 
 <!-- 主内容 -->
 <main class="content">
 
-<!-- 0 安装与启动 -->
+<!-- 1 安装与启动 -->
 <section id="install">
 <h1>WealthVault 用户手册</h1>
 <h2>1. 安装与启动</h2>
-<p class="section-intro">WealthVault 是一个纯前端本地应用，无需安装任何软件，只需一个现代浏览器和 Python 3 即可运行。</p>
+<p class="section-intro">WealthVault 运行在本地电脑上，数据完全存储在自己的设备中，无需注册账号、无需联网。Mac 用户可一键生成桌面应用，Windows 用户双击批处理文件即可启动。</p>
 
-<h3>三种使用方式</h3>
-<table>
-  <tr><th>场景</th><th>是否需要服务器</th><th>推荐方式</th></tr>
-  <tr><td>💻 电脑单独使用</td><td>❌ 不需要</td><td>直接双击 index.html 打开</td></tr>
-  <tr><td>💻📱 电脑 + 手机同时访问</td><td>✅ 需要</td><td>启动 Python 服务器，手机通过 IP 访问</td></tr>
-  <tr><td>📱 手机独立安装</td><td>✅ 一次性需要</td><td>通过服务器访问后，安装为 PWA 桌面 App</td></tr>
-</table>
-
-<div class="divider" style="margin:16px 0"></div>
-
-<h3>方式一：电脑直接打开（最简单）</h3>
-<p>直接在文件夹中<strong>双击 <code>index.html</code></strong>，浏览器会自动打开应用。Safari 和 Edge 完全正常；Chrome 会使用内置备用方案处理加密，不影响使用。</p>
-<div class="tip">建议将打开后的标签页加入书签，下次直接点书签即可，无需找文件。</div>
-
-<div class="divider" style="margin:16px 0"></div>
-
-<h3>方式二：启动服务器（电脑 + 手机同时用）</h3>
+<h3>Mac — 首次安装（只做一次）</h3>
 <div class="steps">
   <div class="step"><div class="step-num">1</div>
-    <div>打开终端，进入 WealthVault 文件夹：
-      <div style="background:var(--bg3);border-radius:6px;padding:10px 14px;margin-top:8px;font-family:monospace;font-size:13px;color:var(--ok)">
-        cd ~/Documents/WealthVault
-      </div>
-    </div>
+    <div>前往 <a href="https://github.com/songhanshuang5-eng/WealthVault/releases" target="_blank">github.com/songhanshuang5-eng/WealthVault/releases</a>，点击最新版本下方的 <strong>Source code (zip)</strong> 下载，解压得到 <code>WealthVault</code> 文件夹</div>
   </div>
   <div class="step"><div class="step-num">2</div>
-    <div>启动本地服务器：
-      <div style="background:var(--bg3);border-radius:6px;padding:10px 14px;margin-top:8px;font-family:monospace;font-size:13px;color:var(--ok)">
-        python3 -m http.server 8282
-      </div>
-      看到 <code>Serving HTTP on 0.0.0.0 port 8282</code> 即表示成功。
-    </div>
+    <div><strong>双击 <code>安装App.command</code></strong><br/>
+    如弹出「无法打开」提示，请<strong>右键点击 → 选择"打开" → 再点"打开"</strong>（只需一次）</div>
   </div>
-  <div class="step"><div class="step-num">3</div>
-    <div>
-      <b>电脑</b>访问：浏览器输入 <code style="color:var(--gold)">http://localhost:8282</code><br/>
-      <b>手机</b>访问：先查电脑的局域网 IP（终端运行 <code>ifconfig | grep "inet "</code> 或 Windows 运行 <code>ipconfig</code>），手机输入 <code style="color:var(--gold)">http://192.168.1.xxx:8282</code>
-    </div>
-  </div>
+  <div class="step"><div class="step-num">3</div><div>脚本自动运行，完成后文件夹内出现 <code>WealthVault.app</code></div></div>
+  <div class="step"><div class="step-num">4</div><div>将 <code>WealthVault.app</code> 拖到桌面或「应用程序」文件夹</div></div>
 </div>
-<p>终端窗口需保持开启，关闭终端即停止服务。按 <span class="kbd">Ctrl + C</span> 可手动停止。</p>
+<div class="tip">安装脚本会自动处理系统安全限制（Gatekeeper），此后双击 App 不会再弹出警告。</div>
+
+<h3>Mac — 日常启动</h3>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div><strong>双击 <code>WealthVault.app</code></strong>，图标在 Dock 中短暂跳动</div></div>
+  <div class="step"><div class="step-num">2</div><div>约 2 秒后浏览器自动打开 <code>https://localhost:8181</code></div></div>
+  <div class="step"><div class="step-num">3</div>
+    <div>若浏览器显示「您的连接不是私密连接」（本地自签名证书的正常提示）：<br/>
+    <b>Chrome</b>：点页面空白处，键盘直接输入 <code>thisisunsafe</code>（无需回车）<br/>
+    <b>Safari</b>：点「显示详细信息」→「访问此网站」<br/>
+    此提示只在第一次出现，之后浏览器会记住。</div>
+  </div>
+  <div class="step"><div class="step-num">4</div><div>进入登录页，输入账号密码开始使用</div></div>
+</div>
+<div class="note">关闭 App（Cmd+Q）时服务器自动停止。若只关闭浏览器标签，服务器继续后台运行，下次直接在浏览器输入地址即可。</div>
 
 <div class="divider" style="margin:16px 0"></div>
 
-<h3>方式三：手机安装为 App（PWA）</h3>
-<p>App 内置离线缓存（Service Worker），可安装到手机桌面像原生 App 一样使用，<strong>安装后不需要电脑开着服务器</strong>。</p>
-
+<h3>Windows — 启动方式</h3>
 <div class="steps">
-  <div class="step"><div class="step-num">1</div><div>先按方式二启动服务器，手机浏览器访问 <code>http://192.168.1.xxx:8282</code></div></div>
-  <div class="step"><div class="step-num">2</div>
-    <div>
-      <b>iOS Safari</b>：点底部分享按钮 → 「添加到主屏幕」→「添加」<br/>
-      <b>Android Chrome</b>：点右上角菜单 → 「添加到主屏幕」或「安装应用」
-    </div>
-  </div>
-  <div class="step"><div class="step-num">3</div><div>桌面出现 WealthVault 图标，之后直接点图标启动，<b>无需浏览器、无需服务器</b>。</div></div>
+  <div class="step"><div class="step-num">1</div><div>确认已安装 Python 3（<a href="https://www.python.org/downloads/" target="_blank">python.org/downloads</a>，安装时勾选「Add Python to PATH」）</div></div>
+  <div class="step"><div class="step-num">2</div><div><strong>双击 <code>启动.bat</code></strong>，弹出黑色终端窗口</div></div>
+  <div class="step"><div class="step-num">3</div><div>浏览器访问 <code style="color:var(--gold)">https://localhost:8181</code>，处理证书提示方法同上</div></div>
 </div>
+<div class="warn">终端窗口需保持开启，关闭终端即停止服务器。</div>
 
-<div class="tip">PWA 数据保存在手机浏览器的 localStorage 中，与电脑各自独立。如需同步，请使用「数据」页面导出 JSON 文件，在另一设备导入。</div>
-<div class="warn">iOS 清除网站数据或卸载后 localStorage 会丢失，建议定期在 App 内备份导出。</div>
+<div class="divider" style="margin:16px 0"></div>
 
-<h3>停止服务器</h3>
-<p>在终端按 <span class="kbd">Ctrl + C</span>。仅在方式二（多设备联用）时才需要启动，方式一和安装后的 PWA 均不依赖服务器。</p>
+<h3>手机安装为 App（PWA）</h3>
+<p>手机与电脑连同一 Wi-Fi，在手机浏览器中访问电脑的局域网地址（格式如 <code>https://192.168.1.xxx:8181</code>，启动时终端会显示具体地址）。</p>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div><b>iOS Safari</b>：点底部分享按钮 → 「添加到主屏幕」→「添加」</div></div>
+  <div class="step"><div class="step-num">2</div><div><b>Android Chrome</b>：点右上角菜单 → 「添加到主屏幕」或「安装应用」</div></div>
+  <div class="step"><div class="step-num">3</div><div>桌面出现 WealthVault 图标，安装后离线也可使用，不依赖电脑</div></div>
+</div>
+<div class="warn">iOS 清除网站数据后数据会丢失，请定期导出 JSON 备份（见第 21 章）。</div>
 
 <h3>文件说明</h3>
 <table>
   <tr><th>文件 / 文件夹</th><th>说明</th></tr>
-  <tr><td><code>index.html</code></td><td>应用主页面，浏览器打开此文件</td></tr>
+  <tr><td><code>WealthVault.app</code></td><td>Mac 桌面应用（运行安装脚本后生成）</td></tr>
+  <tr><td><code>安装App.command</code></td><td>Mac 一次性安装脚本，生成 .app 并处理权限</td></tr>
+  <tr><td><code>启动Mac.command</code></td><td>Mac 备用方式（双击后打开 Terminal 窗口）</td></tr>
+  <tr><td><code>启动.bat</code></td><td>Windows 启动脚本</td></tr>
+  <tr><td><code>index.html</code></td><td>应用主页面</td></tr>
   <tr><td><code>manual.html</code></td><td>本用户手册</td></tr>
-  <tr><td><code>js/</code></td><td>应用逻辑代码，勿随意修改</td></tr>
-  <tr><td><code>js/vendor/</code></td><td>第三方库（React、HTM），无需联网</td></tr>
+  <tr><td><code>server.py</code></td><td>本地 HTTPS 服务器，勿删除</td></tr>
+  <tr><td><code>js/</code></td><td>应用代码，勿随意修改</td></tr>
 </table>
-<div class="note">所有数据保存在浏览器 <code>localStorage</code> 中，不存在任何服务器上。重装系统或更换浏览器前请先导出备份（见第 19 章）。</div>
+<div class="note">所有账本数据保存在浏览器 <code>localStorage</code> 中，不上传任何服务器。重装系统或更换浏览器前请先导出备份（见第 21 章）。</div>
 </section>
 
 <div class="divider"></div>
@@ -835,37 +825,47 @@ tr:last-child td{border-bottom:none}
 
 <div class="divider"></div>
 
-<!-- 16 汇率 -->
+<!-- 17 货币兑换 -->
 <section id="fx">
-<h2>16. 货币兑换</h2>
+<h2>17. 货币兑换</h2>
 
-<p class="section-intro">记录银行换汇操作，系统自动从账户中扣减卖出货币并增加买入货币。</p>
+<p class="section-intro">记录银行换汇操作，系统自动从指定持仓中扣减卖出货币并增加买入货币，精确控制资金来源。</p>
 
 <h3>新建兑换</h3>
 <div class="steps">
   <div class="step"><div class="step-num">1</div><div>选择兑换账户</div></div>
   <div class="step"><div class="step-num">2</div><div>选择卖出货币 + 买入货币</div></div>
-  <div class="step"><div class="step-num">3</div><div>输入卖出金额和买入金额，系统自动显示汇率</div></div>
-  <div class="step"><div class="step-num">4</div><div>点「💱 确认兑换」，两侧余额同步更新</div></div>
+  <div class="step"><div class="step-num">3</div>
+    <div><strong>选择来源持仓</strong>（新功能）：系统列出该账户下所有该币种的正余额持仓
+      <ul style="margin-top:6px">
+        <li>只有一笔持仓时：自动选中，显示「已自动选中」提示</li>
+        <li>有多笔持仓时：下拉菜单供手动选择（例如：活期 vs 某笔定期零头）</li>
+      </ul>
+    </div>
+  </div>
+  <div class="step"><div class="step-num">4</div><div>输入卖出金额和买入金额，系统自动显示汇率</div></div>
+  <div class="step"><div class="step-num">5</div><div>点「💱 确认兑换」，来源持仓精确扣减，买入货币自动入账</div></div>
 </div>
 
 <div class="mock-page">
   <div class="mock-card">
-    <div class="mock-row"><span>卖出</span><span class="neg">-$ 5,000.00 USD</span></div>
-    <div class="mock-row"><span>买入</span><span class="pos">+¥ 36,250.00 CNY</span></div>
-    <div class="mock-row"><span class="mock-label">汇率</span><span>1 USD = 7.2500 CNY</span></div>
-    <div class="mock-row"><span class="mock-label">账户</span><span>工行储蓄卡</span></div>
+    <div class="mock-row"><span class="mock-label">来源持仓</span><span style="color:var(--gold)">C$6,794.57 · 取出部分换美元转HSBC</span></div>
+    <div class="mock-row"><span>卖出</span><span class="neg">-C$ 6,789.99 CAD</span></div>
+    <div class="mock-row"><span>买入</span><span class="pos">+$ 4,910.12 USD</span></div>
+    <div class="mock-row"><span class="mock-label">汇率</span><span>1 CAD = 0.7232 USD</span></div>
+    <div class="mock-row"><span class="mock-label">账户</span><span>寰宇金</span></div>
   </div>
 </div>
 
-<div class="warn">确认兑换前请检查账户余额是否充足，系统会在余额不足时阻止操作。</div>
+<div class="note">选择来源持仓可防止换汇金额被错误扣减到定期存款或其他不应动用的持仓上。删除兑换记录时，金额会精确归还到原来的持仓。</div>
+<div class="warn">余额校验基于所选持仓的单笔余额，超出时系统会阻止提交。</div>
 </section>
 
 <div class="divider"></div>
 
 <!-- 17 转账 -->
 <section id="transfer">
-<h2>17. 资金转账</h2>
+<h2>18. 资金转账</h2>
 
 <p class="section-intro">在同一货币的两个账户之间划拨资金，系统同步更新双方余额。</p>
 
@@ -883,7 +883,7 @@ tr:last-child td{border-bottom:none}
 
 <!-- 18 隐私模式 -->
 <section id="privacy">
-<h2>18. 隐私模式</h2>
+<h2>19. 隐私模式</h2>
 
 <p>点击导航栏右侧的眼睛按钮，切换隐私模式：</p>
 
@@ -904,42 +904,74 @@ tr:last-child td{border-bottom:none}
 
 <div class="divider"></div>
 
-<!-- 19 备份 -->
+<!-- 20 多设备同步 -->
+<section id="sync">
+<h2>20. 多设备同步</h2>
+
+<p class="section-intro">手机与电脑连接同一 Wi-Fi 时，可通过「数据」页面手动推送或拉取数据，实现双向同步。</p>
+
+<h3>同步原理</h3>
+<p>电脑运行的服务器（server.py）充当中转站。推送时，本机数据上传到服务器；拉取时，另一台设备从服务器下载数据覆盖本机。</p>
+
+<div class="mock-page">
+  <div style="font-weight:600;margin-bottom:12px">☁️ 多设备同步</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="mock-stat">
+      <div class="mock-stat-label">📤 推送到服务器</div>
+      <div style="font-size:12px;color:var(--muted);margin:6px 0">把本机数据上传，另一台设备再拉取</div>
+      <span class="mock-btn btn-g">推送本机数据</span>
+    </div>
+    <div class="mock-stat">
+      <div class="mock-stat-label">📥 从服务器拉取</div>
+      <div style="font-size:12px;color:var(--muted);margin:6px 0">覆盖本机数据为服务器上的版本</div>
+      <span class="mock-btn btn-ghost">拉取最新数据</span>
+    </div>
+  </div>
+</div>
+
+<h3>典型操作流程</h3>
+<p><b>电脑 → 手机</b>：在电脑上点「推送本机数据」，再在手机上点「拉取最新数据」。</p>
+<p><b>手机 → 电脑</b>：在手机上点「推送本机数据」，再在电脑上点「拉取最新数据」。</p>
+
+<div class="warn">拉取操作会<strong>覆盖</strong>本机当前数据，拉取前系统会弹出确认提示。如不确定，建议先导出备份。</div>
+<div class="note">同步仅在电脑运行服务器（WealthVault.app 或启动脚本处于运行状态）时有效。手机和电脑须连接同一局域网（同一 Wi-Fi）。</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 21 备份 -->
 <section id="backup">
-<h2>19. 数据备份与恢复</h2>
+<h2>21. 数据备份与恢复</h2>
 
 <p class="section-intro">所有数据存储在浏览器 localStorage 中，换浏览器或清除缓存会导致数据丢失，请定期备份。</p>
 
 <h3>导出备份</h3>
 <div class="steps">
   <div class="step"><div class="step-num">1</div><div>点击顶部「💾 数据」Tab</div></div>
-  <div class="step"><div class="step-num">2</div><div>点「导出数据」，下载 <code>私人账本_2026-06-09.json</code> 文件</div></div>
-  <div class="step"><div class="step-num">3</div><div>妥善保存至本地或云端</div></div>
+  <div class="step"><div class="step-num">2</div><div>点「下载 JSON 文件」，保存至本地或云端</div></div>
 </div>
 
 <h3>导入恢复</h3>
 <div class="steps">
-  <div class="step"><div class="step-num">1</div><div>点「导入数据」，选择之前导出的 .json 文件</div></div>
+  <div class="step"><div class="step-num">1</div><div>点「选择 JSON 文件」，选择之前导出的备份文件</div></div>
   <div class="step"><div class="step-num">2</div><div>确认导入，当前数据会被覆盖</div></div>
 </div>
 
 <div class="warn">导入会覆盖现有所有数据，操作前请先导出一份备份。</div>
 
 <h3>备份提醒</h3>
-<p>每月首次打开 App 时，顶部会出现「📥 本月尚未备份数据」横幅提醒。点「立即备份」等同于导出操作。</p>
+<p>每月首次打开 App 时，顶部会出现「📥 本月尚未备份数据」横幅提醒，点「立即备份」即可下载。</p>
 
 <h3>多账号数据隔离</h3>
-<p>不同用户名的数据互相独立存储，切换用户名登录后看到的是该用户的独立数据。</p>
+<p>不同用户名的数据互相独立，切换用户名登录后看到的是该用户的独立数据。</p>
 
-<div class="tip">
-  建议每月备份一次，备份文件命名加上日期方便管理。如需迁移到新电脑，导出后在新浏览器中登录并导入即可。
-</div>
+<div class="tip">建议每月备份一次，文件名加上日期方便管理。迁移到新电脑时，导出后在新浏览器中登录并导入即可。</div>
 </section>
 
 <div class="divider"></div>
 
 <p style="text-align:center;color:var(--muted);font-size:12px;padding-bottom:40px">
-  WealthVault 用户手册 · 所有示例数据均为虚构，仅用于功能说明
+  WealthVault 用户手册 v1.1 · 所有示例数据均为虚构，仅用于功能说明
 </p>
 
 </main>
