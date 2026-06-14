@@ -50,7 +50,7 @@ function Overview({data,totals,grandTotal,grandAsset,grandLiab,unlinkedInvTotal,
       const cat=inv.category||'variable';
       let val;
       if(cat==='fixed'){const fr=calcFixedReturn(inv);val=fr?fr.principal+fr.accrued:Number(inv.buyPrice)*Number(inv.quantity||1);}
-      else{const p=inv.currentPrice!=null?Number(inv.currentPrice):Number(inv.buyPrice);val=p*Number(inv.quantity||0);}
+      else{const pos=calcEffectivePosition(inv);const p=inv.currentPrice!=null?Number(inv.currentPrice):pos.avgCost;val=p*pos.effectiveQty;}
       assetMap[inv.currency]=(assetMap[inv.currency]||0)+val*r;
     });
     const result=Object.entries(assetMap).filter(([,v])=>v>0).map(([cur,val])=>({value:val,color:CUR_COLORS[cur]||'#888',label:cur,isLiab:false}));
@@ -239,8 +239,9 @@ function Overview({data,totals,grandTotal,grandAsset,grandLiab,unlinkedInvTotal,
                   cost=fr?fr.principal:mv;
                   if(fr&&fr.accrued){pl=fr.accrued;plPct=fr.principal?fr.accrued/fr.principal*100:null;}
                 }else{
-                  cost=Number(inv.buyPrice)*Number(inv.quantity||0);
-                  mv=inv.currentPrice!=null?Number(inv.currentPrice)*Number(inv.quantity||0):cost;
+                  const pos=calcEffectivePosition(inv);
+                  cost=pos.totalCost;
+                  mv=inv.currentPrice!=null?Number(inv.currentPrice)*pos.effectiveQty:cost;
                   if(inv.currentPrice!=null){pl=mv-cost;plPct=cost?pl/cost*100:null;}
                 }
                 return html`

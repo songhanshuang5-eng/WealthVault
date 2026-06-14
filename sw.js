@@ -1,5 +1,5 @@
 // 每次更新JS文件后，把版本号+1，手机会自动拉取新版本
-const CACHE = 'wealthvault-v23';
+const CACHE = 'wealthvault-v24';
 
 const FILES = [
   './',
